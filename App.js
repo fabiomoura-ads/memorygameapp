@@ -1,74 +1,27 @@
+import 'react-native-gesture-handler';
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, ImageBackground, Alert } from 'react-native';
-import { createCardBoard, wonGame } from './src/functions'
-import Board from './src/components/Board'
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import Home from './src/pages/Home'
+import Game from './src/pages/Game'
 
 export default function App() {
 
-  const [board, setBoard] = useState([[]]);
-  const selecteds = [];
-
-  const rows = 3;
-  const columns = 2;
-  const pathImage = "simbols"
-
-  useEffect(() => {
-    newGame();
-  }, [])
-
-  function newGame() {
-    const newBoard = createCardBoard(rows, columns, pathImage)
-    selecteds.splice(0, selecteds.length)
-    setBoard(newBoard)
-  }
-
-  function onOpenSelect(row, column) {
-
-    const selectedItem = board[row][column]
-    selecteds.push(selectedItem)
-
-    if (selecteds.length === 2) {
-
-      const idDoubleItem = selecteds[0].idDoubleItem;
-      const equals = selecteds.filter(item => item.idDoubleItem === idDoubleItem).length === 2
-
-      const newBoard = board.map(rows => {
-        return rows.map(item => {
-          if (equals && item.idDoubleItem == idDoubleItem) {
-            return { ...item, opened: true }
-          } else {
-            return { ...item }
-          }
-        })
-      })
-
-      selecteds.splice(0, selecteds.length);
-
-      if (wonGame(newBoard)) {
-        Alert.alert('Parabéns!', 'Você venceu o jogo!')
-        console.log("Venceu....");
-      }
-
-      setBoard(newBoard);
-    }
-
-
-  }
+  const Stack = createStackNavigator();
 
   return (
-    <>
-      <View style={styles.container}>
-        <ImageBackground source={(require('./src/images/bg.jpg'))} style={{ position: 'absolute', width: '100%', height: '100%' }} >
-          <View style={styles.board}>
-            <Board board={board} onOpenSelect={onOpenSelect} />
-          </View>
-        </ImageBackground>
-      </View>
-      <TouchableOpacity style={styles.containerNewGame} onPress={newGame}>
-        <Text style={styles.textNewGame}>New Game</Text>
-      </TouchableOpacity>
+    <NavigationContainer>
+      <Stack.Navigator>
+        <Stack.Screen
+          name="Home"
+          component={Home}
+          options={{ title: 'Home' }}
+        />
+        <Stack.Screen name="Game" component={Game} options={{ title: 'Game' }} />
+      </Stack.Navigator>
 
-    </>
+    </NavigationContainer>
   );
 }
 
