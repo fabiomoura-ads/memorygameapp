@@ -1,18 +1,14 @@
 import React, { useRef, useState, useEffect } from 'react'
-import { View, Text, StyleSheet, Animated, TouchableOpacity, Image, Alert, TouchableWithoutFeedback } from 'react-native'
-import { getPathImage } from '../functions'
+import { View, Text, StyleSheet, Animated, Image, TouchableWithoutFeedback } from 'react-native'
+import { getImage } from '../functions'
 import PubSub from 'pubsub-js';
 
 export default props => {
-
+    
     const [width, height] = props.params
-    const imageRequire = getPathImage(props.pathImage);
-    let valueCurrent = 0;
+    const requireImage = getImage(props.image);
 
     const animated = useRef(new Animated.Value(0)).current;
-    animated.addListener(({ value }) => {
-        valueCurrent = value
-    })
 
     const frontInterpolate = animated.interpolate({
         inputRange: [0, 180],
@@ -36,20 +32,21 @@ export default props => {
         ]
     }
 
-    useEffect(() => {
-        fechaCard();
-        PubSub.subscribe('cards-open', function (topico, cardsOpen) {
-            cardsOpen.map(item => {
-                if (props.row == item.row && props.column == item.column) {
-                    if (!item.opened) {
-                        setTimeout(function () {
-                            fechaCard()
-                        }, 1200);
-                    }
-                }
+    function openCard() {
+
+        if (props.opened) return
+
+        Animated.sequence([
+            Animated.spring(animated, {
+                toValue: 180,
+                friction: 8,
+                tension: 10,
+            }).start(({ finished }) => {
+                //--aguarda finalização do animated para prosseguir com a chamada do callback props.onOpen
+                props.onOpen(props.row, props.column)
             })
-        })
-    }, [])
+        ])
+    }
 
     function fechaCard() {
         Animated.spring(animated, {
@@ -59,39 +56,26 @@ export default props => {
         }).start()
     }
 
-    function abreCard() {
-
-        if (props.opened) {
-            return;
-        }
-
-        Animated.spring(animated, {
-            toValue: 180,
-            friction: 8,
-            tension: 10
-        }).start()
-
-        props.onOpen(props.row, props.column)
-
+    if (!props.opened) {
+        fechaCard()
     }
 
     return (
 
-
         <View style={[styles.container, { height, width }]}>
 
-            <TouchableWithoutFeedback onPress={() => abreCard()}>
+            <TouchableWithoutFeedback onPress={() => openCard() }>
                 <View>
                     <Animated.View style={[styles.flipCard, { height, width }, frontAnimatedStyle]}>
                         <Image
-                            style={{ width: width / 2, height: height/2}}
+                            style={{ width: width / 2, height: height / 2 }}
                             source={require('../images/default.png')}
                         />
                     </Animated.View>
                     <Animated.View style={[styles.flipCard, styles.flipCardBack, { height, width }, backAnimatedStyle]}>
                         <Image
                             style={{ width: width * 0.95, height: height * 0.95 }}
-                            source={imageRequire}
+                            source={requireImage}
                         />
                     </Animated.View>
                 </View>

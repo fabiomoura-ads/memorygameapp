@@ -5,32 +5,34 @@ const createBoard = (rows, columns) => {
                 row,
                 column,
                 opened: false,
-                pathImage: null
-      
+                image: null,
+                idDoubleItem: null
             }
         })
     })
 }
 
-const spreadCards = (board, pathImages) => {
+const spreadCards = (board, pathImage) => {
     const rows = board.length;
     const columns = board[0].length;
     const totalCards = rows * columns;
-    let cardsIncludes = 0;
 
-    let indexInclude = 1;
+    let cardsIncludes = 0;
+    let idDoubleItem = 1;
     let count = 0;
+
     while (cardsIncludes < totalCards) {
         const rowSel = parseInt(Math.random() * rows, 10);
         const columnSel = parseInt(Math.random() * columns, 10);
-        
-        if ( count > 1) {
-            indexInclude++;            
+
+        if (count > 1) {
+            idDoubleItem++;
             count = 0;
         }
 
-        if (!board[rowSel][columnSel].pathImage) {            
-            board[rowSel][columnSel].pathImage = `simbols/${indexInclude}.png`
+        if (!board[rowSel][columnSel].image) {
+            board[rowSel][columnSel].image = `${pathImage}/${idDoubleItem}.png`
+            board[rowSel][columnSel].idDoubleItem = idDoubleItem
             count++;
             cardsIncludes++;
         }
@@ -50,33 +52,36 @@ const closeAllCards = board => {
         return rows.map(field => {
             return { ...field, opened: false }
         })
-    })    
+    })
 }
 
-const closeCards = ( board, arPathImage ) => {
+const closeCards = (board, arIdDoubleItem) => {
     return board.map(rows => {
         return rows.map(field => {
-            if ( arPathImage.includes(field.pathImage) ) {
+            if (arIdDoubleItem.includes(field.idDoubleItem)) {
                 return { ...field, opened: false }
             } else {
                 return { ...field }
-            }            
+            }
         })
-    })    
+    })
 }
 
-const createCardBoard = (rows, column, pathImages) => {
+const createCardBoard = (rows, column, pathImage) => {
     const board = createBoard(rows, column);
-    spreadCards(board, pathImages)
+    spreadCards(board, pathImage)
     return board;
 }
 
 const fields = board => [].concat(...board);
 
-const checkCardsEquals = (board, select) => fields(board).filter(field => ( field.opened && field.pathImage == select) ).length == 2;
+const checkCardsEquals = (board, select) => fields(board).filter(field => (field.opened && field.image == select)).length == 2;
 
-const getPathImage = (pathImage) =>{
-    switch (pathImage) {
+const wonGame = board => fields(board).filter(item => !item.opened).length === 0
+
+const getImage = (fullPathImage) => {
+    
+    switch (fullPathImage) {
         //--animals
         case "animals/1.png": return require('./images/animals/1.jpg')
         case "animals/2.png": return require('./images/animals/2.jpg')
@@ -108,9 +113,9 @@ const getPathImage = (pathImage) =>{
         case "simbols/18.png": return require('./images/simbols/18.png')
         case "simbols/19.png": return require('./images/simbols/19.png')
         default:
-          return require('./images/simbols/19.png')
-      }
+            return require('./images/simbols/19.png')
+    }
 
 };
 
-export { createCardBoard, getPathImage, closeAllCards, cloneBoard, checkCardsEquals , closeCards}
+export { createCardBoard, getImage, closeAllCards, cloneBoard, checkCardsEquals, closeCards, wonGame }
