@@ -1,11 +1,15 @@
 import React, { useState } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity, ImageBackground, Dimensions, Image } from 'react-native'
-import { SimpleLineIcons } from '@expo/vector-icons';
-import { TouchableHighlight, TouchableWithoutFeedback } from 'react-native-gesture-handler';
 
-const Option = props => (
-    <TouchableOpacity onPress={() => props.onSelectOpt(props.opt)}>
+const OptionLevel = props => (
+    <TouchableOpacity onPress={() => props.onSelect(props.opt)}>
         <Text style={[styles.textOpt, props.selected.join('') == props.opt.join('') ? styles.textOptSelected : null]}>{props.opt.join(':')}</Text>
+    </TouchableOpacity>
+)
+
+const OptionCard = props => (
+    <TouchableOpacity onPress={() => props.onSelect(props.value)}>        
+        <Text style={[styles.textOpt, props.selected == props.value ? styles.textOptSelected : null]}>{props.opt}</Text>
     </TouchableOpacity>
 )
 
@@ -15,9 +19,14 @@ export default props => {
     const height = Dimensions.get('window').height / 4
 
     const [optionLevel, setOptionLevel] = useState([4,3]);
+    const [optionCard, setOptionCard] = useState('animals');
     
     function selectOptionLevel(opt) {
         setOptionLevel(opt)
+    }
+
+    function selectOptionCard(opt) {
+        setOptionCard(opt)
     }
 
     return (
@@ -30,21 +39,28 @@ export default props => {
                         <Text style={styles.textoSelecione}>Selecione o nível do jogo</Text>
                     </View>
 
-                    <View style={styles.containerOptions}>
-                        <Option opt={[4, 3]} selected={optionLevel} onSelectOpt={selectOptionLevel} />
-                        <Option opt={[4, 4]} selected={optionLevel} onSelectOpt={selectOptionLevel} />
-                        <Option opt={[5, 4]} selected={optionLevel} onSelectOpt={selectOptionLevel} />
-                        <Option opt={[5, 5]} selected={optionLevel} onSelectOpt={selectOptionLevel} />
-                        <Option opt={[6, 5]} selected={optionLevel} onSelectOpt={selectOptionLevel} />
-                        <Option opt={[6, 6]} selected={optionLevel} onSelectOpt={selectOptionLevel} />
-                        <Option opt={[7, 6]} selected={optionLevel} onSelectOpt={selectOptionLevel} />
-                        <Option opt={[7, 7]} selected={optionLevel} onSelectOpt={selectOptionLevel} />
-                        <Option opt={[8, 7]} selected={optionLevel} onSelectOpt={selectOptionLevel} />
-                        <Option opt={[8, 8]} selected={optionLevel} onSelectOpt={selectOptionLevel} />
+                    <View style={styles.containerOptionsLevel}>
+                        <OptionLevel opt={[4, 3]} selected={optionLevel} onSelect={selectOptionLevel} />
+                        <OptionLevel opt={[4, 4]} selected={optionLevel} onSelect={selectOptionLevel} />
+                        <OptionLevel opt={[5, 4]} selected={optionLevel} onSelect={selectOptionLevel} />
+                        <OptionLevel opt={[5, 5]} selected={optionLevel} onSelect={selectOptionLevel} />
+                        <OptionLevel opt={[6, 5]} selected={optionLevel} onSelect={selectOptionLevel} />
+                        <OptionLevel opt={[6, 6]} selected={optionLevel} onSelect={selectOptionLevel} />                    
                     </View>
+
+                    <View style={styles.containerTextoSelecione}>
+                        <Text style={styles.textoSelecione}>Selecione o tipo de cartas</Text>
+                    </View>
+
+                    <View style={styles.containerOptionsCard}>
+                        <OptionCard opt={'Animais'} value={"animals"} selected={optionCard} onSelect={selectOptionCard} />
+                        <OptionCard opt={'Símbolos'} value={"simbols"} selected={optionCard} onSelect={selectOptionCard} />
+                        <OptionCard opt={'Carros'} value={"cars"} selected={optionCard} onSelect={selectOptionCard} />
+                    </View>
+
                 </View>
                 <View style={styles.containerButton}>
-                    <TouchableOpacity onPress={() => props.navigation.navigate('Game', { title: '11111', optionLevel: optionLevel})}>
+                    <TouchableOpacity onPress={() => props.navigation.navigate('Game', { optionLevel, optionCard })}>
                         <Text style={styles.buttonIniciar}> Iniciar jogo </Text>
                     </TouchableOpacity>
                 </View>
@@ -104,11 +120,16 @@ const styles = StyleSheet.create({
         color: "#ffa",
         fontStyle: "italic"
     },
-    containerOptions: {
+    containerOptionsLevel: {
         flexDirection: "row",
         flexWrap: "wrap",
         alignItems: "center",
         justifyContent: "space-around",
+    },  
+    containerOptionsCard: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
     },    
     textOpt: {
         borderColor: "red",

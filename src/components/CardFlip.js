@@ -1,13 +1,11 @@
-import React, { useRef, useState, useEffect } from 'react'
+import React, { useRef } from 'react'
 import { View, Text, StyleSheet, Animated, Image, TouchableWithoutFeedback } from 'react-native'
 import { getImage } from '../functions'
-import PubSub from 'pubsub-js';
 
 export default props => {
-    
+
     const [width, height] = props.params
     const requireImage = getImage(props.image);
-
     const animated = useRef(new Animated.Value(0)).current;
 
     const frontInterpolate = animated.interpolate({
@@ -36,16 +34,13 @@ export default props => {
 
         if (props.opened) return
 
-        Animated.sequence([
-            Animated.spring(animated, {
-                toValue: 180,
-                friction: 8,
-                tension: 10,
-            }).start(({ finished }) => {
-                //--aguarda finalização do animated para prosseguir com a chamada do callback props.onOpen
-                props.onOpen(props.row, props.column)
-            })
-        ])
+        Animated.spring(animated, {
+            toValue: 180,
+            friction: 8,
+            tension: 10,
+        }).start(({ finished }) => {
+            props.onOpen(props.row, props.column)
+        })
     }
 
     function fechaCard() {
@@ -64,7 +59,7 @@ export default props => {
 
         <View style={[styles.container, { height, width }]}>
 
-            <TouchableWithoutFeedback onPress={() => openCard() }>
+            <TouchableWithoutFeedback onPress={() => openCard()}>
                 <View>
                     <Animated.View style={[styles.flipCard, { height, width }, frontAnimatedStyle]}>
                         <Image
@@ -74,7 +69,7 @@ export default props => {
                     </Animated.View>
                     <Animated.View style={[styles.flipCard, styles.flipCardBack, { height, width }, backAnimatedStyle]}>
                         <Image
-                            style={{ width: width * 0.95, height: height * 0.95 }}
+                            style={{ width: width * 0.9, height: height * 0.9 }}
                             source={requireImage}
                         />
                     </Animated.View>
@@ -90,7 +85,7 @@ const styles = StyleSheet.create({
     container: {
         borderWidth: 1,
         margin: 3,
-        //backgroundColor: "blue"
+        backgroundColor: "#B0C4DE"
     },
     flipCard: {
         alignItems: "center",
@@ -100,7 +95,6 @@ const styles = StyleSheet.create({
 
     },
     flipCardBack: {
-        backgroundColor: "red",
         position: "absolute",
     },
     flipText: {

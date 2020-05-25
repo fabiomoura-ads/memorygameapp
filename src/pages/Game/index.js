@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, ImageBackground, Alert } from 'react-native';
+import { StyleSheet, View, ImageBackground, Alert } from 'react-native';
 import { createCardBoard, wonGame } from './../../functions'
 import Board from '../../components/Board'
 
@@ -7,9 +7,8 @@ export default props => {
 
     const [board, setBoard] = useState([[]]);
     const [rows, columns] = props.route.params.optionLevel
+    const pathImage = props.route.params.optionCard
     const selecteds = [];
-
-    const pathImage = "simbols"
 
     useEffect(() => {
         newGame();
@@ -45,17 +44,22 @@ export default props => {
 
             if (wonGame(newBoard)) {
                 Alert.alert('Parabéns!', 'Você venceu o jogo!')
-                console.log("Venceu....");
+
+                setInterval(function () {
+                    props.navigation.goBack()
+                }, 1500);
             }
 
             setBoard(newBoard);
         }
     }
 
+
+
     return (
         <>
             <View style={styles.container}>
-                <ImageBackground source={(require('../../images/bg.jpg'))} style={{width: '100%', height: '100%' }} >
+                <ImageBackground source={(require('../../images/bg.jpg'))} style={{ width: '100%', height: '100%' }} >
                     <View style={styles.board}>
                         <Board board={board} onOpenSelect={onOpenSelect} />
                     </View>

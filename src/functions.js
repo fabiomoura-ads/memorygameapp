@@ -47,26 +47,6 @@ const cloneBoard = board => {
     })
 }
 
-const closeAllCards = board => {
-    return board.map(rows => {
-        return rows.map(field => {
-            return { ...field, opened: false }
-        })
-    })
-}
-
-const closeCards = (board, arIdDoubleItem) => {
-    return board.map(rows => {
-        return rows.map(field => {
-            if (arIdDoubleItem.includes(field.idDoubleItem)) {
-                return { ...field, opened: false }
-            } else {
-                return { ...field }
-            }
-        })
-    })
-}
-
 const createCardBoard = (rows, column, pathImage) => {
     const board = createBoard(rows, column);
     spreadCards(board, pathImage)
@@ -75,22 +55,31 @@ const createCardBoard = (rows, column, pathImage) => {
 
 const fields = board => [].concat(...board);
 
-const checkCardsEquals = (board, select) => fields(board).filter(field => (field.opened && field.image == select)).length == 2;
-
 const wonGame = board => fields(board).filter(item => !item.opened).length === 0
 
 const getImage = (fullPathImage) => {
-    
+
     switch (fullPathImage) {
         //--animals
-        case "animals/1.png": return require('./images/animals/1.jpg')
-        case "animals/2.png": return require('./images/animals/2.jpg')
-        case "animals/3.png": return require('./images/animals/3.jpg')
-        case "animals/4.png": return require('./images/animals/4.jpg')
-        case "animals/5.png": return require('./images/animals/5.jpg')
-        case "animals/6.png": return require('./images/animals/6.jpg')
-        case "animals/7.png": return require('./images/animals/7.jpg')
-        case "animals/8.png": return require('./images/animals/8.jpg')
+        case "animals/1.png": return require('./images/animals/1.png')
+        case "animals/2.png": return require('./images/animals/2.png')
+        case "animals/3.png": return require('./images/animals/3.png')
+        case "animals/4.png": return require('./images/animals/4.png')
+        case "animals/5.png": return require('./images/animals/5.png')
+        case "animals/6.png": return require('./images/animals/6.png')
+        case "animals/7.png": return require('./images/animals/7.png')
+        case "animals/8.png": return require('./images/animals/8.png')
+        case "animals/9.png": return require('./images/animals/9.png')
+        case "animals/10.png": return require('./images/animals/10.png')
+        case "animals/11.png": return require('./images/animals/11.png')
+        case "animals/12.png": return require('./images/animals/12.png')
+        case "animals/13.png": return require('./images/animals/13.png')
+        case "animals/14.png": return require('./images/animals/14.png')
+        case "animals/15.png": return require('./images/animals/15.png')
+        case "animals/16.png": return require('./images/animals/16.png')
+        case "animals/17.png": return require('./images/animals/17.png')
+        case "animals/18.png": return require('./images/animals/18.png')
+        case "animals/19.png": return require('./images/animals/19.png')
 
         //--simbols
         case "simbols/1.png": return require('./images/simbols/1.png')
@@ -112,10 +101,32 @@ const getImage = (fullPathImage) => {
         case "simbols/17.png": return require('./images/simbols/17.png')
         case "simbols/18.png": return require('./images/simbols/18.png')
         case "simbols/19.png": return require('./images/simbols/19.png')
+
+        //--cars
+        case "cars/1.png": return require('./images/cars/1.png')
+        case "cars/2.png": return require('./images/cars/2.png')
+        case "cars/3.png": return require('./images/cars/3.png')
+        case "cars/4.png": return require('./images/cars/4.png')
+        case "cars/5.png": return require('./images/cars/5.png')
+        case "cars/6.png": return require('./images/cars/6.png')
+        case "cars/7.png": return require('./images/cars/7.png')
+        case "cars/8.png": return require('./images/cars/8.png')
+        case "cars/9.png": return require('./images/cars/9.png')
+        case "cars/10.png": return require('./images/cars/10.png')
+        case "cars/11.png": return require('./images/cars/11.png')
+        case "cars/12.png": return require('./images/cars/12.png')
+        case "cars/13.png": return require('./images/cars/13.png')
+        case "cars/14.png": return require('./images/cars/14.png')
+        case "cars/15.png": return require('./images/cars/15.png')
+        case "cars/16.png": return require('./images/cars/16.png')
+        case "cars/17.png": return require('./images/cars/17.png')
+        case "cars/18.png": return require('./images/cars/18.png')
+        case "cars/19.png": return require('./images/cars/19.png')
+        
         default:
             return require('./images/simbols/19.png')
     }
 
 };
 
-export { createCardBoard, getImage, closeAllCards, cloneBoard, checkCardsEquals, closeCards, wonGame }
+export { createCardBoard, getImage, cloneBoard, wonGame }
