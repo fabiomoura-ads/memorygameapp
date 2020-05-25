@@ -82,10 +82,10 @@ const styles = StyleSheet.create({
         paddingHorizontal: 30,
     },
     textHeader: {
-        fontSize: 40,
+        fontSize: 35,
         textAlign: "center",
         fontWeight: "bold",
-        color: "#00f",
+        color: "red",
     },
     textButton: {
         color: "#fff",
@@ -134,7 +134,7 @@ const styles = StyleSheet.create({
     textOpt: {
         borderColor: "red",
         padding: 10,
-        margin: 5,
+        margin: 1,
         borderRadius: 5,
         borderColor: "#ccc",
         backgroundColor: "#FF6347",

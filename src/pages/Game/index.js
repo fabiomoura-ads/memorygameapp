@@ -44,10 +44,7 @@ export default props => {
 
             if (wonGame(newBoard)) {
                 Alert.alert('Parabéns!', 'Você venceu o jogo!')
-
-                setInterval(function () {
-                    props.navigation.goBack()
-                }, 1500);
+                setTimeout(() => props.navigation.goBack(), 1500)
             }
 
             setBoard(newBoard);
