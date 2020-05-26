@@ -13,9 +13,6 @@ const Option = props => {
 
 export default props => {
 
-    const width = Dimensions.get('window').width / 2
-    const height = Dimensions.get('window').height / 4
-
     const [optionLevel, setOptionLevel] = useState([4, 3]);
     const [optionCard, setOptionCard] = useState('animals');
     const [optionPreview, setOptionPreview] = useState(false);
@@ -32,7 +29,7 @@ export default props => {
 
     return (
         <View style={styles.container}>
-            
+
             <View style={styles.header}>
                 <Text style={styles.title}>Jogo da Memória</Text>
             </View>
@@ -64,7 +61,7 @@ export default props => {
 
             </View>
 
-            <View style={styles.footer}>            
+            <View style={styles.footer}>
                 <TouchableOpacity onPress={() => props.navigation.navigate('Game', { optionLevel, optionCard, optionPreview })}>
                     <Text style={styles.buttonStart}> Iniciar jogo </Text>
                 </TouchableOpacity>
@@ -96,14 +93,12 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: "center",
         justifyContent: "center",
-        //paddingBottom: 30
     },
     title: {
         fontSize: 35,
         textAlign: "center",
         fontWeight: "bold",
         color: "red",
-        //marginBottom: 20,
     },
     textButton: {
         color: "#fff",
@@ -153,6 +148,6 @@ const styles = StyleSheet.create({
 
 
 
-  
+
 
 })

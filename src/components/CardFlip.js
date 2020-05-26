@@ -57,7 +57,6 @@ export default props => {
             toValue: 180,
             speed: 12            
         }).start()
-
     }
 
     return (

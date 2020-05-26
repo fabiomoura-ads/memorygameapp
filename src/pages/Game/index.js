@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { StyleSheet, View, Text, Alert, TouchableOpacity } from 'react-native';
 import { createCardBoard, wonGame, closeBoard } from './../../functions'
 import Board from '../../components/Board'
@@ -6,60 +6,62 @@ import Board from '../../components/Board'
 const Relogio = props => {
 
     const [time, setTime] = useState(props.time)
+    const idIntervalRef = useRef(0);
 
-    function retornaDataFormatada(dataParam) {
-        let data = new Date(dataParam);
+    function retornaDataFormatada() {
+        let data = new Date(time);
         return data.getHours().toString().padStart(2, '0') + ":" + data.getMinutes().toString().padStart(2, '0') + ":" + data.getSeconds().toString().padStart(2, '0')
     }
 
     useEffect(() => {
         const idInterval = setInterval(() => {
-            props.onRefresh(time)
             setTime(time.setSeconds(time.getSeconds() + 1))
         }, 1000)
 
+        idIntervalRef.current = idInterval;
+
         return function () {
-            clearInterval(idInterval)
+            clearInterval(idIntervalRef.current)
         }
+
     }, [])
+
+    useEffect(() => {
+        if (props.finishGame) {
+            clearInterval(idIntervalRef.current)
+        }
+
+    }, [time])
 
 
     return (
         <View style={styles.headerTime}>
             { /* <Text style={styles.points}>100 Pontos</Text> */}
-            <Text style={styles.timer}>{props.timeFinish ? props.timeFinish : retornaDataFormatada(time)}</Text>
+            <Text style={styles.timer}>{retornaDataFormatada()}</Text>
         </View>
     )
 }
 
-const dataGame = new Date();
-dataGame.setHours(0, 0, 0, 0)
-
 export default props => {
 
-    const [board, setBoard] = useState([[]]);
     const [rows, columns] = props.route.params.optionLevel
     const showPreview = props.route.params.optionPreview
     const pathImage = props.route.params.optionCard
+
+    const [board, setBoard] = useState([[]]);
     const [finishGame, setFinishGame] = useState(false);
-    const selecteds = [];
     const [gameInitialized, setGameInitialized] = useState((showPreview ? false : true));
+    const dataGame = useRef(new Date).current;
+
+
+
+    const selecteds = [];
     const points = 10;
 
     useEffect(() => {
         newGame(showPreview)
-        return () => {
-            dataGame.setHours(0, 0, 0, 0)
-        }
+        dataGame.setHours(0, 0, 0, 0)
     }, [])
-
-    function retornaDataFormatada() {
-        return dataGame.getHours().toString().padStart(2, '0') + ":" + dataGame.getMinutes().toString().padStart(2, '0') + ":" + dataGame.getSeconds().toString().padStart(2, '0')
-    }
-
-    useEffect(() => {
-        console.log("Finish atualizado " + finishGame)
-    }, [finishGame])
 
     function startGame() {
         const newBoard = closeBoard(board)
@@ -71,10 +73,6 @@ export default props => {
         const newBoard = createCardBoard(rows, columns, pathImage, showOpenedCards)
         selecteds.splice(0, selecteds.length)
         setBoard(newBoard)
-    }
-
-    function refreshTime(time) {
-        dataGame.setTime(time)
     }
 
     function onOpenSelect(row, column) {
@@ -102,7 +100,6 @@ export default props => {
 
             if (wonGame(newBoard)) {
                 Alert.alert('Parabéns!', 'Você venceu o jogo em ' + dataGame.getMinutes() + ":" + dataGame.getSeconds())
-                console.log("Finalizadno" + dataGame.getMinutes() + " - " + dataGame.getSeconds())
                 setFinishGame(true);
             }
 
@@ -116,7 +113,7 @@ export default props => {
                     ? <TouchableOpacity style={styles.containerNewGame} onPress={startGame}>
                         <Text style={styles.textNewGame}>Iniciar</Text>
                     </TouchableOpacity>
-                    : <Relogio time={dataGame} points={points} onRefresh={refreshTime} timeFinish={finishGame ? retornaDataFormatada(dataGame) : false} />}
+                    : <Relogio time={dataGame} points={points} finishGame={finishGame} />}
                 <View style={styles.board}>
                     <Board board={board} onOpenSelect={onOpenSelect} />
                 </View>
