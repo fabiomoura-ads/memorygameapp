@@ -36,7 +36,7 @@ export default props => {
 
         Animated.spring(animated, {
             toValue: 180,
-            speed: 12
+            speed: 15
         }).start(({ finished }) => {
             props.onOpen(props.row, props.column)
         })
@@ -46,8 +46,7 @@ export default props => {
     function fechaCard() {
         Animated.spring(animated, {
             toValue: 0,
-            friction: 8,
-            tension: 10
+            speed: 15
         }).start()
     }
 
@@ -56,7 +55,7 @@ export default props => {
     } else {
         Animated.spring(animated, {
             toValue: 180,
-            speed: 12
+            speed: 12            
         }).start()
 
     }
