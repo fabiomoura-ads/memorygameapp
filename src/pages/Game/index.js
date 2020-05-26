@@ -1,23 +1,80 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, View, ImageBackground, Alert } from 'react-native';
-import { createCardBoard, wonGame } from './../../functions'
+import { StyleSheet, View, Text, Alert, TouchableOpacity } from 'react-native';
+import { createCardBoard, wonGame, closeBoard } from './../../functions'
 import Board from '../../components/Board'
+
+const Relogio = props => {
+
+    const [time, setTime] = useState(props.time)
+
+    function retornaDataFormatada(dataParam) {
+        let data = new Date(dataParam);
+        return data.getHours().toString().padStart(2, '0') + ":" + data.getMinutes().toString().padStart(2, '0') + ":" + data.getSeconds().toString().padStart(2, '0')
+    }
+
+    useEffect(() => {
+        const idInterval = setInterval(() => {
+            props.onRefresh(time)
+            setTime(time.setSeconds(time.getSeconds() + 1))
+        }, 1000)
+
+        return function () {
+            clearInterval(idInterval)
+        }
+    }, [])
+
+
+    return (
+        <View style={styles.headerTime}>
+            { /* <Text style={styles.points}>100 Pontos</Text> */}
+            <Text style={styles.timer}>{props.timeFinish ? props.timeFinish : retornaDataFormatada(time)}</Text>
+        </View>
+    )
+}
+
+const dataGame = new Date();
+dataGame.setHours(0, 0, 0, 0)
 
 export default props => {
 
     const [board, setBoard] = useState([[]]);
     const [rows, columns] = props.route.params.optionLevel
+    const showPreview = props.route.params.optionPreview
     const pathImage = props.route.params.optionCard
+    const [finishGame, setFinishGame] = useState(false);
     const selecteds = [];
+    const [gameInitialized, setGameInitialized] = useState((showPreview ? false : true));
+    const points = 10;
 
     useEffect(() => {
-        newGame();
+        newGame(showPreview)
+        return () => {
+            dataGame.setHours(0, 0, 0, 0)
+        }
     }, [])
 
-    function newGame() {
-        const newBoard = createCardBoard(rows, columns, pathImage)
+    function retornaDataFormatada() {
+        return dataGame.getHours().toString().padStart(2, '0') + ":" + dataGame.getMinutes().toString().padStart(2, '0') + ":" + dataGame.getSeconds().toString().padStart(2, '0')
+    }
+
+    useEffect(() => {
+        console.log("Finish atualizado " + finishGame)
+    }, [finishGame])
+
+    function startGame() {
+        const newBoard = closeBoard(board)
+        setBoard(newBoard)
+        setGameInitialized(true);
+    }
+
+    function newGame(showOpenedCards) {
+        const newBoard = createCardBoard(rows, columns, pathImage, showOpenedCards)
         selecteds.splice(0, selecteds.length)
         setBoard(newBoard)
+    }
+
+    function refreshTime(time) {
+        dataGame.setTime(time)
     }
 
     function onOpenSelect(row, column) {
@@ -41,30 +98,30 @@ export default props => {
             })
 
             selecteds.splice(0, selecteds.length);
+            setBoard(newBoard);
 
             if (wonGame(newBoard)) {
-                Alert.alert('Parabéns!', 'Você venceu o jogo!')
-                setTimeout(() => props.navigation.goBack(), 1500)
+                Alert.alert('Parabéns!', 'Você venceu o jogo em ' + dataGame.getMinutes() + ":" + dataGame.getSeconds())
+                console.log("Finalizadno" + dataGame.getMinutes() + " - " + dataGame.getSeconds())
+                setFinishGame(true);
             }
 
-            setBoard(newBoard);
         }
     }
-
-
 
     return (
         <>
             <View style={styles.container}>
-                <ImageBackground source={(require('../../images/bg.jpg'))} style={{ width: '100%', height: '100%' }} >
-                    <View style={styles.board}>
-                        <Board board={board} onOpenSelect={onOpenSelect} />
-                    </View>
-                </ImageBackground>
+                {!gameInitialized
+                    ? <TouchableOpacity style={styles.containerNewGame} onPress={startGame}>
+                        <Text style={styles.textNewGame}>Iniciar</Text>
+                    </TouchableOpacity>
+                    : <Relogio time={dataGame} points={points} onRefresh={refreshTime} timeFinish={finishGame ? retornaDataFormatada(dataGame) : false} />}
+                <View style={styles.board}>
+                    <Board board={board} onOpenSelect={onOpenSelect} />
+                </View>
             </View>
-            {/*<TouchableOpacity style={styles.containerNewGame} onPress={newGame}>
-                <Text style={styles.textNewGame}>New Game</Text>
-    </TouchableOpacity>*/}
+            {/**/}
         </>
     );
 }
@@ -72,31 +129,18 @@ export default props => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
+        backgroundColor: '#ffc77d',
         alignItems: 'center',
-        justifyContent: 'center',
+        justifyContent: 'flex-start',
+    },
+    header: {
+        width: "100%",
+        alignItems: "center"
     },
     board: {
+        marginTop: 15,
         alignItems: "center",
         justifyContent: "center"
-    },
-    form: {
-        padding: 8,
-        height: 80,
-        justifyContent: "center",
-        flexDirection: "row",
-        paddingTop: 13,
-        borderTopWidth: 1,
-        borderColor: "#eee",
-    },
-    input: {
-        height: 40,
-        backgroundColor: "#eee",
-        borderRadius: 4,
-        paddingVertical: 5,
-        paddingHorizontal: 10,
-        borderWidth: 1,
-        borderColor: "#eee"
     },
     botton: {
         width: 40,
@@ -107,26 +151,45 @@ const styles = StyleSheet.create({
         borderRadius: 4,
         marginLeft: 10,
     },
-    containerNewGame: {
-        flex: 0.05,
-        marginBottom: 5,
-        paddingVertical: 5,
-        paddingHorizontal: 30,
-        flexDirection: "row",
-        justifyContent: "center",
-        backgroundColor: "#eee",
-        alignItems: "center",
-        borderColor: "#eee",
-        borderWidth: 2,
-        borderRadius: 40
-    },
     textNewGame: {
-        fontSize: 20,
-        fontWeight: "bold",
+        fontSize: 16,
+        color: "#994c00",
+        fontWeight: "bold"
     },
     image: {
         flex: 1,
         resizeMode: "cover",
         justifyContent: "center"
     },
+    containerNewGame: {
+        paddingHorizontal: 5,
+        paddingVertical: 3,
+        flexDirection: "row",
+        justifyContent: "center",
+        backgroundColor: "#eee",
+        alignItems: "center",
+        borderColor: "#eee",
+        borderRadius: 5,
+        borderWidth: 3,
+    },
+    headerTime: {
+        backgroundColor: "#e0e0e0",
+        borderLeftColor: "#ffcc99",
+        borderTopColor: "#ffcc99",
+        borderRightColor: "#ff9933",
+        borderBottomColor: "#ff9933",
+        flexDirection: "row",
+        alignItems: "center",
+        paddingHorizontal: 5,
+        paddingVertical: 3,
+        width: "95%",
+        borderRadius: 2,
+        borderWidth: 3,
+        justifyContent: "space-around"
+    },
+    textHeaderTime: {
+        fontSize: 16,
+        color: "#994c00",
+        fontWeight: "bold"
+    }
 });

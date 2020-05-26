@@ -1,10 +1,10 @@
-const createBoard = (rows, columns) => {
+const createBoard = (rows, columns, opened) => {
     return Array(rows).fill(0).map((_, row) => {
         return Array(columns).fill(0).map((_, column) => {
             return {
                 row,
                 column,
-                opened: false,
+                opened: opened,
                 image: null,
                 idDoubleItem: null
             }
@@ -47,11 +47,20 @@ const cloneBoard = board => {
     })
 }
 
-const createCardBoard = (rows, column, pathImage) => {
-    const board = createBoard(rows, column);
+const closeBoard = board => {
+    return board.map(rows => {
+        return rows.map(field => {
+            return { ...field, opened: false }
+        })
+    })
+}
+
+const createCardBoard = (rows, column, pathImage, showOpenedCards) => {
+    const board = createBoard(rows, column, showOpenedCards);
     spreadCards(board, pathImage)
     return board;
 }
+
 
 const fields = board => [].concat(...board);
 
@@ -129,4 +138,4 @@ const getImage = (fullPathImage) => {
 
 };
 
-export { createCardBoard, getImage, cloneBoard, wonGame }
+export { createCardBoard, getImage, cloneBoard, wonGame, closeBoard }

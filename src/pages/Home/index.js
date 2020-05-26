@@ -1,71 +1,76 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity, ImageBackground, Dimensions, Image } from 'react-native'
 
-const OptionLevel = props => (
-    <TouchableOpacity onPress={() => props.onSelect(props.opt)}>
-        <Text style={[styles.textOpt, props.selected.join('') == props.opt.join('') ? styles.textOptSelected : null]}>{props.opt.join(':')}</Text>
+const Option = props => {
+    return <TouchableOpacity onPress={() => props.onSelect(props.value)}>
+        {
+            props.selected instanceof Array
+                ? <Text style={[styles.textItemOption, (props.selected.join('') == props.value.join('')) ? styles.textOptSelected : null]}>{props.opt}</Text>
+                : <Text style={[styles.textItemOption, (props.selected.toString() == props.value.toString()) ? styles.textOptSelected : null]}>{props.opt}</Text>
+        }
     </TouchableOpacity>
-)
-
-const OptionCard = props => (
-    <TouchableOpacity onPress={() => props.onSelect(props.value)}>        
-        <Text style={[styles.textOpt, props.selected == props.value ? styles.textOptSelected : null]}>{props.opt}</Text>
-    </TouchableOpacity>
-)
+}
 
 export default props => {
 
     const width = Dimensions.get('window').width / 2
     const height = Dimensions.get('window').height / 4
 
-    const [optionLevel, setOptionLevel] = useState([4,3]);
+    const [optionLevel, setOptionLevel] = useState([4, 3]);
     const [optionCard, setOptionCard] = useState('animals');
-    
+    const [optionPreview, setOptionPreview] = useState(false);
+
     function selectOptionLevel(opt) {
         setOptionLevel(opt)
     }
-
     function selectOptionCard(opt) {
         setOptionCard(opt)
+    }
+    function selectOptionPreview(opt) {
+        setOptionPreview(opt)
     }
 
     return (
         <View style={styles.container}>
-            <ImageBackground source={require('../../images/bg_home.jpg')} style={{ width: "100%", height: "100%" }}>
-                <View style={styles.header}>
-                    <Text style={styles.textHeader}>Jogo da Memória</Text>
+            
+            <View style={styles.header}>
+                <Text style={styles.title}>Jogo da Memória</Text>
+            </View>
 
-                    <View style={styles.containerTextoSelecione}>
-                        <Text style={styles.textoSelecione}>Selecione o nível do jogo</Text>
-                    </View>
+            <View style={styles.body}>
 
-                    <View style={styles.containerOptionsLevel}>
-                        <OptionLevel opt={[4, 3]} selected={optionLevel} onSelect={selectOptionLevel} />
-                        <OptionLevel opt={[4, 4]} selected={optionLevel} onSelect={selectOptionLevel} />
-                        <OptionLevel opt={[5, 4]} selected={optionLevel} onSelect={selectOptionLevel} />
-                        <OptionLevel opt={[5, 5]} selected={optionLevel} onSelect={selectOptionLevel} />
-                        <OptionLevel opt={[6, 5]} selected={optionLevel} onSelect={selectOptionLevel} />
-                        <OptionLevel opt={[6, 6]} selected={optionLevel} onSelect={selectOptionLevel} />                    
-                    </View>
-
-                    <View style={styles.containerTextoSelecione}>
-                        <Text style={styles.textoSelecione}>Selecione o tipo de cartas</Text>
-                    </View>
-
-                    <View style={styles.containerOptionsCard}>
-                        <OptionCard opt={'Animais'} value={"animals"} selected={optionCard} onSelect={selectOptionCard} />
-                        <OptionCard opt={'Símbolos'} value={"simbols"} selected={optionCard} onSelect={selectOptionCard} />
-                        <OptionCard opt={'Carros'} value={"cars"} selected={optionCard} onSelect={selectOptionCard} />
-                    </View>
-
+                <Text style={styles.textInfoOption}>Nível do jogo</Text>
+                <View style={styles.containerOptions}>
+                    <Option opt={[4, 3]} value={[4, 3]} selected={optionLevel} onSelect={selectOptionLevel} />
+                    <Option opt={[4, 4]} value={[4, 4]} selected={optionLevel} onSelect={selectOptionLevel} />
+                    <Option opt={[5, 4]} value={[5, 4]} selected={optionLevel} onSelect={selectOptionLevel} />
+                    <Option opt={[5, 5]} value={[5, 5]} selected={optionLevel} onSelect={selectOptionLevel} />
+                    <Option opt={[6, 5]} value={[6, 5]} selected={optionLevel} onSelect={selectOptionLevel} />
+                    <Option opt={[6, 6]} value={[6, 6]} selected={optionLevel} onSelect={selectOptionLevel} />
                 </View>
-                <View style={styles.containerButton}>
-                    <TouchableOpacity onPress={() => props.navigation.navigate('Game', { optionLevel, optionCard })}>
-                        <Text style={styles.buttonIniciar}> Iniciar jogo </Text>
-                    </TouchableOpacity>
+
+                <Text style={styles.textInfoOption}>Tipo de cartas</Text>
+                <View style={styles.containerOptions}>
+                    <Option opt={'Animais'} value={"animals"} selected={optionCard} onSelect={selectOptionCard} />
+                    <Option opt={'Símbolos'} value={"simbols"} selected={optionCard} onSelect={selectOptionCard} />
+                    <Option opt={'Carros'} value={"cars"} selected={optionCard} onSelect={selectOptionCard} />
                 </View>
-            </ImageBackground>
+
+                <Text style={styles.textInfoOption}>Pré-visualizar cartas?</Text>
+                <View style={styles.containerOptions}>
+                    <Option opt={'Sim'} value={true} selected={optionPreview} onSelect={selectOptionPreview} />
+                    <Option opt={'Não'} value={false} selected={optionPreview} onSelect={selectOptionPreview} />
+                </View>
+
+            </View>
+
+            <View style={styles.footer}>            
+                <TouchableOpacity onPress={() => props.navigation.navigate('Game', { optionLevel, optionCard, optionPreview })}>
+                    <Text style={styles.buttonStart}> Iniciar jogo </Text>
+                </TouchableOpacity>
+            </View>
         </View>
+
     )
 }
 
@@ -73,19 +78,32 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         alignItems: "center",
-        borderColor: "#ccc"
+        borderColor: "#ccc",
+        backgroundColor: "#ffc77d"
     },
     header: {
-        flex: 3,
+        flex: 1,
         alignItems: "center",
         justifyContent: "center",
         paddingHorizontal: 30,
     },
-    textHeader: {
+    body: {
+        flex: 2,
+        alignItems: "center",
+        justifyContent: "space-around",
+    },
+    footer: {
+        flex: 1,
+        alignItems: "center",
+        justifyContent: "center",
+        //paddingBottom: 30
+    },
+    title: {
         fontSize: 35,
         textAlign: "center",
         fontWeight: "bold",
         color: "red",
+        //marginBottom: 20,
     },
     textButton: {
         color: "#fff",
@@ -94,44 +112,30 @@ const styles = StyleSheet.create({
         fontSize: 30,
         paddingBottom: 10
     },
-    containerButton: {
-        flex: 1,
-        alignItems: "center",
-        justifyContent: "center",
-        paddingBottom: 30
-    },
-    buttonIniciar: {
+    buttonStart: {
         fontSize: 30,
         paddingVertical: 15,
         paddingHorizontal: 30,
-        color: "#ccd",
+        color: "#ffc",
         backgroundColor: "red",
         borderColor: "#ccc",
         borderRadius: 30,
         fontStyle: "italic",
         fontWeight: "bold",
     },
-    containerTextoSelecione: {
-        marginTop: 50,
+    textInfoOption: {
+        fontSize: 20,
+        color: "#E8643C",
+        fontStyle: "italic",
         marginBottom: 5,
     },
-    textoSelecione: {
-        fontSize: 16,
-        color: "#ffa",
-        fontStyle: "italic"
-    },
-    containerOptionsLevel: {
+    containerOptions: {
         flexDirection: "row",
         flexWrap: "wrap",
         alignItems: "center",
         justifyContent: "space-around",
-    },  
-    containerOptionsCard: {
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "center",
-    },    
-    textOpt: {
+    },
+    textItemOption: {
         borderColor: "red",
         padding: 10,
         margin: 1,
@@ -144,6 +148,11 @@ const styles = StyleSheet.create({
     },
     textOptSelected: {
         backgroundColor: "red",
-    }
+        color: "#fff"
+    },
+
+
+
+  
 
 })

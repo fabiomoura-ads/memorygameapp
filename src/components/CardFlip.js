@@ -36,11 +36,11 @@ export default props => {
 
         Animated.spring(animated, {
             toValue: 180,
-            friction: 8,
-            tension: 10,
+            speed: 12
         }).start(({ finished }) => {
             props.onOpen(props.row, props.column)
         })
+
     }
 
     function fechaCard() {
@@ -53,6 +53,12 @@ export default props => {
 
     if (!props.opened) {
         fechaCard()
+    } else {
+        Animated.spring(animated, {
+            toValue: 180,
+            speed: 12
+        }).start()
+
     }
 
     return (
@@ -85,7 +91,7 @@ const styles = StyleSheet.create({
     container: {
         borderWidth: 1,
         margin: 3,
-        backgroundColor: "#B0C4DE"
+        backgroundColor: '#ffc77d'
     },
     flipCard: {
         alignItems: "center",
