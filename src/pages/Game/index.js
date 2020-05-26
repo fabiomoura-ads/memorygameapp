@@ -36,7 +36,7 @@ const Relogio = props => {
 
     return (
         <View style={styles.headerTime}>
-            { /* <Text style={styles.points}>100 Pontos</Text> */}
+             <Text style={styles.points}>{props.pointsGame}</Text>
             <Text style={styles.timer}>{retornaDataFormatada()}</Text>
         </View>
     )
@@ -52,11 +52,10 @@ export default props => {
     const [finishGame, setFinishGame] = useState(false);
     const [gameInitialized, setGameInitialized] = useState((showPreview ? false : true));
     const dataGame = useRef(new Date).current;
-
-
+    const countAttempts = useRef({total: 0}).current;
+    const pointsGame = useRef({total: 0}).current;
 
     const selecteds = [];
-    const points = 10;
 
     useEffect(() => {
         newGame(showPreview)
@@ -75,16 +74,44 @@ export default props => {
         setBoard(newBoard)
     }
 
+    function refreshPoints(){
+        console.log("Calculando " + countAttempts.total + " tantetivass ")
+        switch (countAttempts) {
+            case 1: 
+                pointsGame.total += 10
+                break;
+            case 2: 
+                pointsGame.total += 8
+                break;
+            case 3: 
+                pointsGame.total += 6
+                break;
+            case 4: 
+                pointsGame.total += 4
+                break;
+            default: 
+                pointsGame.total += 2
+                break;
+        }
+        countAttempts.total = 0;
+    }
+
     function onOpenSelect(row, column) {
 
         const selectedItem = board[row][column]
         selecteds.push(selectedItem)
+        
 
         if (selecteds.length === 2) {
+            countAttempts.total += 1;
 
             const idDoubleItem = selecteds[0].idDoubleItem;
             const equals = selecteds.filter(item => item.idDoubleItem === idDoubleItem).length === 2
 
+            if ( equals ) {
+                refreshPoints()
+            }
+            
             const newBoard = board.map(rows => {
                 return rows.map(item => {
                     if (equals && item.idDoubleItem == idDoubleItem) {
@@ -99,7 +126,7 @@ export default props => {
             setBoard(newBoard);
 
             if (wonGame(newBoard)) {
-                Alert.alert('Parabéns!', 'Você venceu o jogo em ' + dataGame.getMinutes() + ":" + dataGame.getSeconds())
+                Alert.alert('Parabéns!', 'Você venceu o jogo em ' + dataGame.getMinutes() + "min e " + dataGame.getSeconds() + "seg")
                 setFinishGame(true);
             }
 
@@ -113,7 +140,7 @@ export default props => {
                     ? <TouchableOpacity style={styles.containerNewGame} onPress={startGame}>
                         <Text style={styles.textNewGame}>Iniciar</Text>
                     </TouchableOpacity>
-                    : <Relogio time={dataGame} points={points} finishGame={finishGame} />}
+                    : <Relogio time={dataGame} pointsGame={pointsGame.total} finishGame={finishGame} />}
                 <View style={styles.board}>
                     <Board board={board} onOpenSelect={onOpenSelect} />
                 </View>
