@@ -24,7 +24,7 @@ export default function App() {
       <Stack.Navigator
         screenOptions={{
           headerStyle: {
-            backgroundColor: '##f47100',
+            backgroundColor: '#f47100',
           },
           headerTintColor: '#ffff',
           headerTitleStyle: {
@@ -34,9 +34,9 @@ export default function App() {
         <Stack.Screen
           name="Home"
           component={Home}
-          options={{ title: 'Home' }}
+          options={{ title: 'Home'}}
         />
-        <Stack.Screen name="Game" component={Game} options={{ title: 'Game' }} />
+        <Stack.Screen name="Game" component={Game} options={{ title: 'Jogo da Memória' }} />
       </Stack.Navigator>
 
     </NavigationContainer >

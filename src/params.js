@@ -23,7 +23,7 @@ const params = {
 		const width = Dimensions.get('window').width - 70
 		this.blockSizeWidth = Math.floor(width / columns )
 
-		const totalHeight = Dimensions.get('window').height - 60
+		const totalHeight = Dimensions.get('window').height - 70
 		const boardHeight = totalHeight * ( 1 - this.headerRatio )		
 		this.blockSizeHeight = Math.floor(boardHeight / rows)
 

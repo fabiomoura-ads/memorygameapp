@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from 'react'
-import { View, Text, StyleSheet, TouchableOpacity, ImageBackground, Dimensions, Image } from 'react-native'
+import React, { useState, useEffect, useRef } from 'react'
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
+import { BannerAdMobBanner } from '../../components/BannerAdMob'
+import { AdMobInterstitial } from 'expo-ads-admob'
 
 const Option = props => {
     return <TouchableOpacity onPress={() => props.onSelect(props.value)}>
         {
             props.selected instanceof Array
-                ? <Text style={[styles.textItemOption, (props.selected.join('') == props.value.join('')) ? styles.textOptSelected : null]}>{props.opt}</Text>
+                ? <Text style={[styles.textItemOption, (props.selected.join('') == props.value.join('')) ? styles.textOptSelected : null]}>{props.opt.join(':')}</Text>
                 : <Text style={[styles.textItemOption, (props.selected.toString() == props.value.toString()) ? styles.textOptSelected : null]}>{props.opt}</Text>
         }
     </TouchableOpacity>
@@ -16,6 +18,19 @@ export default props => {
     const [optionLevel, setOptionLevel] = useState([4, 3]);
     const [optionCard, setOptionCard] = useState('animals');
     const [optionPreview, setOptionPreview] = useState(false);
+    const countPlays = useRef(0);
+
+    useEffect(() => {
+        async function load() {
+            await AdMobInterstitial.setAdUnitID('ca-app-pub-3966719253606702/1496212326')
+        }
+        load();
+    })
+
+    async function ShowAdMobInterstitial() {
+        await AdMobInterstitial.requestAdAsync({ servePersonalizedAds: true })
+        await AdMobInterstitial.showAdAsync();
+    }
 
     function selectOptionLevel(opt) {
         setOptionLevel(opt)
@@ -25,6 +40,15 @@ export default props => {
     }
     function selectOptionPreview(opt) {
         setOptionPreview(opt)
+    }
+
+    async function toGame() {
+        countPlays.current++;
+        if (countPlays.current == 3) {
+            await ShowAdMobInterstitial();
+            countPlays.current = 0;
+        }
+        props.navigation.navigate('Game', { optionLevel, optionCard, optionPreview })
     }
 
     return (
@@ -62,10 +86,13 @@ export default props => {
             </View>
 
             <View style={styles.footer}>
-                <TouchableOpacity onPress={() => props.navigation.navigate('Game', { optionLevel, optionCard, optionPreview })}>
+                <TouchableOpacity onPress={() => toGame()}>
                     <Text style={styles.buttonStart}> Iniciar jogo </Text>
                 </TouchableOpacity>
             </View>
+
+            <BannerAdMobBanner />
+
         </View>
 
     )
@@ -85,7 +112,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 30,
     },
     body: {
-        flex: 2,
+        flex: 3,
         alignItems: "center",
         justifyContent: "space-around",
     },
@@ -93,6 +120,7 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: "center",
         justifyContent: "center",
+        marginBottom: 5
     },
     title: {
         fontSize: 35,

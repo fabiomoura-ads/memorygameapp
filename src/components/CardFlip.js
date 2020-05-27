@@ -88,15 +88,20 @@ export default props => {
 const styles = StyleSheet.create({
     container: {
         borderWidth: 1,
-        margin: 3,
+        margin: 2,
         backgroundColor: '#ffc77d'
     },
     flipCard: {
         alignItems: "center",
-        justifyContent: "center",
+        justifyContent: "center",        
+        backfaceVisibility: "hidden",
         backgroundColor: "blue",
-        backfaceVisibility: "hidden"
-
+        borderLeftColor: "#ffcc99",
+        borderTopColor: "#ffcc99",
+        borderRightColor: "#ff9933",
+        borderBottomColor: "#ff9933",
+        borderRadius: 2,
+        borderWidth: 4,    
     },
     flipCardBack: {
         position: "absolute",

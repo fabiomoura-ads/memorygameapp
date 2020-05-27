@@ -1,11 +1,10 @@
 {
   "expo": {
-    "name": "memorygameapp",
+    "name": "Jogo da Memória",
     "slug": "memorygameapp",
     "platforms": [
       "ios",
-      "android",
-      "web"
+      "android"
     ],
     "version": "1.0.0",
     "orientation": "portrait",
@@ -13,7 +12,7 @@
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#f47100"
     },
     "updates": {
       "fallbackToCacheTimeout": 0
@@ -22,11 +21,17 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "config": {
+        "googleMobileAdsAppId": "ca-app-pub-3966719253606702~8061620671"
+      }
     },
     "android": {
-      "package": "com.yourcompany.yourappname",
-      "versionCode": 1
+      "package": "com.fmourabrasil.memorygameapp",
+      "versionCode": 1,
+      "config": {
+        "googleMobileAdsAppId": "ca-app-pub-3966719253606702~8061620671"
+      }
     }
   }
 }

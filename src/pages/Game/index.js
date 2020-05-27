@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { StyleSheet, View, Text, Alert, TouchableOpacity } from 'react-native';
 import { createCardBoard, wonGame, closeBoard } from './../../functions'
 import Board from '../../components/Board'
+import { BannerAdMobBanner } from '../../components/BannerAdMob'
 
 const Relogio = props => {
 
@@ -21,6 +22,7 @@ const Relogio = props => {
         idIntervalRef.current = idInterval;
 
         return function () {
+            setTime(time.setHours(0, 0, 0, 0))
             clearInterval(idIntervalRef.current)
         }
 
@@ -30,14 +32,12 @@ const Relogio = props => {
         if (props.finishGame) {
             clearInterval(idIntervalRef.current)
         }
-
     }, [time])
-
 
     return (
         <View style={styles.headerTime}>
-             <Text style={styles.points}>{props.pointsGame}</Text>
-            <Text style={styles.timer}>{retornaDataFormatada()}</Text>
+            <Text style={styles.textHeaderTime}>Pontos: {props.pointsGame} </Text>
+            <Text style={styles.textHeaderTime}>Tempo: {retornaDataFormatada()}</Text>
         </View>
     )
 }
@@ -51,9 +51,13 @@ export default props => {
     const [board, setBoard] = useState([[]]);
     const [finishGame, setFinishGame] = useState(false);
     const [gameInitialized, setGameInitialized] = useState((showPreview ? false : true));
-    const dataGame = useRef(new Date).current;
-    const countAttempts = useRef({total: 0}).current;
-    const pointsGame = useRef({total: 0}).current;
+
+    const dataBase = new Date();
+    dataBase.setHours(0, 0, 0, 0);
+    const dataGame = useRef(dataBase).current;
+
+    const countAttempts = useRef({ value: 0 }).current;
+    const pointsGame = useRef({ value: 0 }).current;
 
     const selecteds = [];
 
@@ -74,44 +78,43 @@ export default props => {
         setBoard(newBoard)
     }
 
-    function refreshPoints(){
-        console.log("Calculando " + countAttempts.total + " tantetivass ")
-        switch (countAttempts) {
-            case 1: 
-                pointsGame.total += 10
+    function refreshPoints() {
+
+        switch (countAttempts.value) {
+            case 1:
+                pointsGame.value += 10
                 break;
-            case 2: 
-                pointsGame.total += 8
+            case 2:
+                pointsGame.value += 8
                 break;
-            case 3: 
-                pointsGame.total += 6
+            case 3:
+                pointsGame.value += 6
                 break;
-            case 4: 
+            case 4:
                 pointsGame.total += 4
                 break;
-            default: 
-                pointsGame.total += 2
+            default:
+                pointsGame.value += 2
                 break;
         }
-        countAttempts.total = 0;
+        countAttempts.value = 0;
     }
 
     function onOpenSelect(row, column) {
 
         const selectedItem = board[row][column]
         selecteds.push(selectedItem)
-        
 
         if (selecteds.length === 2) {
-            countAttempts.total += 1;
+            countAttempts.value += 1;
 
             const idDoubleItem = selecteds[0].idDoubleItem;
             const equals = selecteds.filter(item => item.idDoubleItem === idDoubleItem).length === 2
 
-            if ( equals ) {
+            if (equals) {
                 refreshPoints()
             }
-            
+
             const newBoard = board.map(rows => {
                 return rows.map(item => {
                     if (equals && item.idDoubleItem == idDoubleItem) {
@@ -126,11 +129,17 @@ export default props => {
             setBoard(newBoard);
 
             if (wonGame(newBoard)) {
-                Alert.alert('Parabéns!', 'Você venceu o jogo em ' + dataGame.getMinutes() + "min e " + dataGame.getSeconds() + "seg")
+                showMessageFinish()
                 setFinishGame(true);
             }
-
         }
+    }
+
+    function showMessageFinish() {
+        let msg = `Você venceu o jogo! 
+        \nTempo: ${ dataGame.getMinutes() ? dataGame.getMinutes() + ' minutos e ': ''} ${dataGame.getSeconds()} segundos
+        \nPontos: ${ pointsGame.value} `
+        Alert.alert('Parabéns!', msg)
     }
 
     return (
@@ -140,12 +149,13 @@ export default props => {
                     ? <TouchableOpacity style={styles.containerNewGame} onPress={startGame}>
                         <Text style={styles.textNewGame}>Iniciar</Text>
                     </TouchableOpacity>
-                    : <Relogio time={dataGame} pointsGame={pointsGame.total} finishGame={finishGame} />}
+                    : <Relogio time={dataGame} pointsGame={pointsGame.value} finishGame={finishGame} />}
                 <View style={styles.board}>
                     <Board board={board} onOpenSelect={onOpenSelect} />
                 </View>
             </View>
-            {/**/}
+            
+            <BannerAdMobBanner />
         </>
     );
 }
@@ -162,7 +172,7 @@ const styles = StyleSheet.create({
         alignItems: "center"
     },
     board: {
-        marginTop: 15,
+        marginTop: 10,
         alignItems: "center",
         justifyContent: "center"
     },
@@ -204,9 +214,9 @@ const styles = StyleSheet.create({
         borderBottomColor: "#ff9933",
         flexDirection: "row",
         alignItems: "center",
-        paddingHorizontal: 5,
-        paddingVertical: 3,
-        width: "95%",
+        //paddingHorizontal: 5,
+        //paddingVertical: 1,
+        width: "90%",
         borderRadius: 2,
         borderWidth: 3,
         justifyContent: "space-around"
