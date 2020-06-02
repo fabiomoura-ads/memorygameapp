@@ -3,15 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
 import { BannerAdMobBanner } from '../../components/BannerAdMob'
 import { AdMobInterstitial } from 'expo-ads-admob'
 
-const Option = props => {
-    return <TouchableOpacity onPress={() => props.onSelect(props.value)}>
-        {
-            props.selected instanceof Array
-                ? <Text style={[styles.textItemOption, (props.selected.join('') == props.value.join('')) ? styles.textOptSelected : null]}>{props.opt.join(':')}</Text>
-                : <Text style={[styles.textItemOption, (props.selected.toString() == props.value.toString()) ? styles.textOptSelected : null]}>{props.opt}</Text>
-        }
-    </TouchableOpacity>
-}
+const isProduction = false;
 
 export default props => {
 
@@ -24,7 +16,7 @@ export default props => {
         async function load() {
             await AdMobInterstitial.setAdUnitID('ca-app-pub-3966719253606702/1496212326')
         }
-        load();
+        //load();
     })
 
     async function ShowAdMobInterstitial() {
@@ -44,11 +36,11 @@ export default props => {
 
     async function toGame() {
         countPlays.current++;
-        if (countPlays.current == 3) {
+        if (countPlays.current == 3 && isProduction) {
             await ShowAdMobInterstitial();
             countPlays.current = 0;
         }
-        props.navigation.navigate('Game', { optionLevel, optionCard, optionPreview })
+        props.navigation.navigate('Player', { optionLevel, optionCard, optionPreview })
     }
 
     return (
@@ -60,38 +52,24 @@ export default props => {
 
             <View style={styles.body}>
 
-                <Text style={styles.textInfoOption}>Nível do jogo</Text>
-                <View style={styles.containerOptions}>
-                    <Option opt={[4, 3]} value={[4, 3]} selected={optionLevel} onSelect={selectOptionLevel} />
-                    <Option opt={[4, 4]} value={[4, 4]} selected={optionLevel} onSelect={selectOptionLevel} />
-                    <Option opt={[5, 4]} value={[5, 4]} selected={optionLevel} onSelect={selectOptionLevel} />
-                    <Option opt={[5, 5]} value={[5, 5]} selected={optionLevel} onSelect={selectOptionLevel} />
-                    <Option opt={[6, 5]} value={[6, 5]} selected={optionLevel} onSelect={selectOptionLevel} />
-                    <Option opt={[6, 6]} value={[6, 6]} selected={optionLevel} onSelect={selectOptionLevel} />
+                <View style={styles.boxButton}>
+                    <TouchableOpacity onPress={() => toGame()}>
+
+                        <Text style={styles.buttonStart}>Modo Competição</Text>
+
+                    </TouchableOpacity>
                 </View>
 
-                <Text style={styles.textInfoOption}>Tipo de cartas</Text>
-                <View style={styles.containerOptions}>
-                    <Option opt={'Animais'} value={"animals"} selected={optionCard} onSelect={selectOptionCard} />
-                    <Option opt={'Símbolos'} value={"simbols"} selected={optionCard} onSelect={selectOptionCard} />
-                    <Option opt={'Carros'} value={"cars"} selected={optionCard} onSelect={selectOptionCard} />
-                </View>
+                <View style={styles.boxButton}>
+                    <TouchableOpacity onPress={() => toGame()}>
 
-                <Text style={styles.textInfoOption}>Pré-visualizar cartas?</Text>
-                <View style={styles.containerOptions}>
-                    <Option opt={'Sim'} value={true} selected={optionPreview} onSelect={selectOptionPreview} />
-                    <Option opt={'Não'} value={false} selected={optionPreview} onSelect={selectOptionPreview} />
-                </View>
+                        <Text style={styles.buttonStart}>Modo Normal</Text>
 
+                    </TouchableOpacity>
+                </View>
             </View>
 
-            <View style={styles.footer}>
-                <TouchableOpacity onPress={() => toGame()}>
-                    <Text style={styles.buttonStart}> Iniciar jogo </Text>
-                </TouchableOpacity>
-            </View>
-
-            <BannerAdMobBanner />
+            {isProduction ? <BannerAdMobBanner /> : false}
 
         </View>
 
@@ -112,15 +90,10 @@ const styles = StyleSheet.create({
         paddingHorizontal: 30,
     },
     body: {
-        flex: 3,
-        alignItems: "center",
-        justifyContent: "space-around",
-    },
-    footer: {
         flex: 1,
+        width: "90%",
         alignItems: "center",
-        justifyContent: "center",
-        marginBottom: 5
+        justifyContent: "center"
     },
     title: {
         fontSize: 35,
@@ -135,19 +108,24 @@ const styles = StyleSheet.create({
         fontSize: 30,
         paddingBottom: 10
     },
-    buttonStart: {
-        fontSize: 30,
-        paddingVertical: 15,
-        paddingHorizontal: 30,
-        color: "#ffc",
+    boxButton: {
+        height: 70,
+        width: "90%",
         backgroundColor: "red",
         borderColor: "#ccc",
-        borderRadius: 30,
+        borderRadius: 30,        
+        textAlign: "center",
+        justifyContent: "center",
+        marginTop: 30
+    },
+    buttonStart: {
+        fontSize: 30,
+        color: "#ffc",
         fontStyle: "italic",
         fontWeight: "bold",
     },
     textInfoOption: {
-        fontSize: 20,
+        fontSize: 25,
         color: "#E8643C",
         fontStyle: "italic",
         marginBottom: 5,

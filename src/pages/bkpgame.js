@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { StyleSheet, View, Text, Alert, TouchableOpacity, AsyncStorage } from 'react-native';
+import { StyleSheet, View, Text, Alert, TouchableOpacity } from 'react-native';
 import { createCardBoard, wonGame, closeBoard } from './../../functions'
 import Board from '../../components/Board'
 import { BannerAdMobBanner } from '../../components/BannerAdMob'
@@ -49,7 +49,6 @@ export default props => {
     const [rows, columns] = props.route.params.optionLevel
     const showPreview = props.route.params.optionPreview
     const pathImage = props.route.params.optionCard
-    const players = props.route.params.players
 
     const [board, setBoard] = useState([[]]);
     const [finishGame, setFinishGame] = useState(false);
@@ -59,37 +58,15 @@ export default props => {
     dataBase.setHours(0, 0, 0, 0);
     const dataGame = useRef(dataBase).current;
 
-    const playerCurrent = useRef({ player_id: 0 }).current
-    console.log("Players" + players);
     const countAttempts = useRef({ value: 0 }).current;
     const pointsGame = useRef({ value: 0 }).current;
-
-    const [rankings, setRankings] = useState([]);
 
     const selecteds = [];
 
     useEffect(() => {
-        async function loadRankings() {
-            const rankingsStorage = await AsyncStorage.getItem('rankings');
-            if (rankingsStorage) {
-                setRankings(JSON.parse(rankingsStorage));
-            }
-        }
-        loadRankings();
-
         newGame(showPreview)
         dataGame.setHours(0, 0, 0, 0)
     }, [])
-
-    useEffect(() => {
-        console.log('Salvando rankings')
-        async function saveStorage() {
-            try {
-                AsyncStorage.setItem('rankings', JSON.stringify(hankings))
-            } catch (e) { }
-        }
-        saveStorage();
-    }, [rankings])
 
     function startGame() {
         const newBoard = closeBoard(board)
@@ -101,17 +78,6 @@ export default props => {
         const newBoard = createCardBoard(rows, columns, pathImage, showOpenedCards)
         selecteds.splice(0, selecteds.length)
         setBoard(newBoard)
-    }
-
-    function saveRanking() {
-        const newRankings = rankings.map(ranking => {
-            if (ranking.player_id == props.playser_id) {
-                return { ...ranking, victories: ranking.victories++ }
-            } else {
-                return { ...ranking }
-            }
-        })
-        setRankings(newRankings)
     }
 
     function refreshPoints() {
@@ -167,16 +133,14 @@ export default props => {
             if (wonGame(newBoard)) {
                 showMessageFinish()
                 setFinishGame(true);
-                saveRanking();
             }
         }
     }
 
     function showMessageFinish() {
-        let msg = `Partida encerrada! 
-        \nTempo: ${ dataGame.getMinutes() ? dataGame.getMinutes() + ' minutos e ' : ''} ${dataGame.getSeconds()} segundos
-        \nPontos: ${ pointsGame.value} 
-        \n\nPreparando tabuleiro para o próximo jogador `
+        let msg = `Você venceu o jogo! 
+        \nTempo: ${ dataGame.getMinutes() ? dataGame.getMinutes() + ' minutos e ': ''} ${dataGame.getSeconds()} segundos
+        \nPontos: ${ pointsGame.value} `
         Alert.alert('Parabéns!', msg)
     }
 
@@ -192,8 +156,8 @@ export default props => {
                     <Board board={board} onOpenSelect={onOpenSelect} />
                 </View>
             </View>
-
-            {isProduction ? <BannerAdMobBanner /> : false}
+            
+            { isProduction ? <BannerAdMobBanner /> : false }
         </>
     );
 }

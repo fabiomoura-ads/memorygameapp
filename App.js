@@ -5,6 +5,7 @@ import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import Home from './src/pages/Home'
 import Game from './src/pages/Game'
+import Player from './src/pages/Player'
 
 const MyTheme = {
   ...DefaultTheme,
@@ -31,12 +32,14 @@ export default function App() {
             fontWeight: 'bold',
           },
         }}>
+        <Stack.Screen name="Player" component={Player} options={{ title: 'Jogo da Memória - Modo Competição' }} />
         <Stack.Screen
           name="Home"
           component={Home}
-          options={{ title: 'Home'}}
+          options={{ title: 'Home' }}
         />
         <Stack.Screen name="Game" component={Game} options={{ title: 'Jogo da Memória' }} />
+
       </Stack.Navigator>
 
     </NavigationContainer >
