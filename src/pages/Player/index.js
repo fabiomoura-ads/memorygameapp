@@ -1,83 +1,30 @@
 import React, { useState, useEffect, useRef } from 'react'
-import {
-    View, Text, StyleSheet, TouchableOpacity, AsyncStorage, KeyboardAvoidingView,
-    Platform, FlatList, TextInput, Keyboard, Alert, ImageBackground
-} from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, AsyncStorage, KeyboardAvoidingView, Platform, FlatList, TextInput, Keyboard, Alert, ImageBackground } from 'react-native'
 import { BannerAdMobBanner } from '../../components/BannerAdMob'
 import { AdMobInterstitial } from 'expo-ads-admob'
 import { Ionicons, MaterialIcons, AntDesign } from '@expo/vector-icons';
 import Option from '../../components/Option'
 import Trofeu from '../../images/trofeu.png';
+import params from '../../params';
 
 const isProduction = false;
 
-const initialPlayer = { id: 0, name: '', victories: 0 }
+const initialPlayer = { id: 0, name: '' }
 
 export default props => {
 
+    const PLAYERS_STORAGA_NAME = params.payerStorageName
+    const RANKINGS_STORAGA_NAME = params.rankingsStorageName
+
     const [players, setPlayers] = useState([]);
+    const [newPlayer, setNewPlayer] = useState(initialPlayer);
     const [rankings, setRankings] = useState([]);
 
-    const [newPlayer, setNewPlayer] = useState(initialPlayer);
     const [optionLevel, setOptionLevel] = useState([4, 3]);
     const [optionCard, setOptionCard] = useState('animals');
     const [optionPreview, setOptionPreview] = useState(false);
+
     const countPlays = useRef(0);
-
-    const rankingsRef = useRef({value: []}).current;
-
-    async function loadRankings() {
-        const rankingsStorage = await AsyncStorage.getItem('rankings');
-        if (rankingsStorage) {
-            rankingsRef.value = JSON.parse(rankingsStorage)
-            setRankings(rankingsRef.value);
-        }
-    }
-
-    function sortPlayers(a, b){
-        debugger
-        const rk = rankingsRef.value;
-        const rkCurrent = rk.filter(level => level.id == optionLevel.join(':') )[0]
-
-        if ( rkCurrent ){
-            if ( rkCurrent.players.length ) {
-                let pa = rkCurrent.players.filter(p => p.id == a.id )
-                let pb = rkCurrent.players.filter(p => p.id == b.id )
-                if ( pa.length && pb.length ) {
-                    if (pa.victories > pb.victories) {
-                        return 1;
-                      }
-                      if (pa.victories < pb.victories) {
-                        return -1;
-                      }
-                      // a must be equal to b
-                      return 0;
-                } else if ( pa.length ) {
-                    return 1
-                } else if ( pb.length ) {
-                    return -1
-                } else {
-                    return 0
-                }
-            }   
-        }
-        
-        
-    }
-    async function loadPlayers() {
-        const playersStorage = await AsyncStorage.getItem('players');
-    
-        if (playersStorage) {
-            const newPlayersStorage = JSON.parse(playersStorage);
-            newPlayersStorage.sort(sortPlayers)
-            setPlayers(JSON.parse(playersStorage));
-        }
-    }
-
-    function resertar() {
-        AsyncStorage.removeItem('players')
-        AsyncStorage.removeItem('rankings')
-    }
 
     useEffect(() => {
         loadRankings();
@@ -86,14 +33,14 @@ export default props => {
 
     useEffect(() => {
         async function saveStorage() {
-            AsyncStorage.setItem('players', JSON.stringify(players))
+            AsyncStorage.setItem(PLAYERS_STORAGA_NAME, JSON.stringify(players))
         }
         saveStorage();
     }, [players])
 
     useEffect(() => {
         async function saveStorage() {
-            AsyncStorage.setItem('rankings', JSON.stringify(rankings))
+            AsyncStorage.setItem(RANKINGS_STORAGA_NAME, JSON.stringify(rankings))
         }
 
         saveStorage();
@@ -105,6 +52,25 @@ export default props => {
         }
         //load();
     })
+
+    async function loadRankings() {
+        const rankingsStorage = await AsyncStorage.getItem(RANKINGS_STORAGA_NAME);
+        if (rankingsStorage) {
+            setRankings(JSON.parse(rankingsStorage));
+        }
+    }
+
+    async function loadPlayers() {
+        const playersStorage = await AsyncStorage.getItem(PLAYERS_STORAGA_NAME);
+        if (playersStorage) {
+            setPlayers(JSON.parse(playersStorage));
+        }
+    }
+
+    function resetData() {
+        AsyncStorage.removeItem(PLAYERS_STORAGA_NAME)
+        AsyncStorage.removeItem(RANKINGS_STORAGA_NAME)
+    }
 
     function selectOptionLevel(opt) {
         setOptionLevel(opt)
@@ -187,107 +153,112 @@ export default props => {
         props.navigation.navigate('Game', { optionLevel, optionCard, optionPreview, players, onLoadingRankings: loadRankings })
     }
 
-    function getVictories(item) {
+    function getVictories(player) {
+        const idOptionLevel = optionLevel.join(':').toString();
+        const rankingLevel = rankings.filter(level => level.id == idOptionLevel)
 
-        const indiceOptLevel = optionLevel.join(':');
-        const rkPlayer = rankings.filter(r => r.id == indiceOptLevel)
-        if (rkPlayer.length === 0) return
-        let qtdVictories = 0;
-        rkPlayer[0].players.map(player => {
-            if (player.id == item.id) {
-                qtdVictories = player.victories
+        if (rankingLevel.length === 0) return
+
+        let victories = 0;
+        rankingLevel[0].players.map(p => {
+            if (p.id == player.id) {
+                victories = p.victories
             }
         })
-        return qtdVictories;
+        return victories;
     }
 
     return (
         <>
-            <View style={styles.container}>
-                <View style={styles.body}>
+            <KeyboardAvoidingView
+                keyboardVerticalOffset={0}
+                behavior="padding"
+                style={{ flex: 1 }}
+                enabled={Platform.OS === 'ios'}>
+                <View style={styles.container}>
+                    <View style={styles.body}>
 
-                    <Text style={styles.textTitle}>Nível do jogo</Text>
-                    <View style={styles.containerOptions}>
-                        <Option opt={[4, 3]} value={[4, 3]} selected={optionLevel} onSelect={selectOptionLevel} />
-                        <Option opt={[4, 4]} value={[4, 4]} selected={optionLevel} onSelect={selectOptionLevel} />
-                        <Option opt={[5, 4]} value={[5, 4]} selected={optionLevel} onSelect={selectOptionLevel} />
-                        <Option opt={[5, 5]} value={[5, 5]} selected={optionLevel} onSelect={selectOptionLevel} />
-                        <Option opt={[6, 5]} value={[6, 5]} selected={optionLevel} onSelect={selectOptionLevel} />
-                        <Option opt={[6, 6]} value={[6, 6]} selected={optionLevel} onSelect={selectOptionLevel} />
+                        <Text style={styles.textTitle}>Nível do jogo</Text>
+                        <View style={styles.containerOptions}>
+                            <Option opt={[4, 3]} value={[4, 3]} selected={optionLevel} onSelect={selectOptionLevel} />
+                            <Option opt={[4, 4]} value={[4, 4]} selected={optionLevel} onSelect={selectOptionLevel} />
+                            <Option opt={[5, 4]} value={[5, 4]} selected={optionLevel} onSelect={selectOptionLevel} />
+                            <Option opt={[5, 5]} value={[5, 5]} selected={optionLevel} onSelect={selectOptionLevel} />
+                            <Option opt={[6, 5]} value={[6, 5]} selected={optionLevel} onSelect={selectOptionLevel} />
+                            <Option opt={[6, 6]} value={[6, 6]} selected={optionLevel} onSelect={selectOptionLevel} />
+                        </View>
+
+                        <Text style={styles.textTitle}>Hanking</Text>
+
+                        <FlatList
+                            style={styles.flatList}
+                            data={players}
+                            keyExtractor={(_, index) => index.toString()}
+                            showsVerticalScrollIndicator={false}
+                            renderItem={({ item }) => (
+                                <View style={styles.flatItem}>
+                                    <Text style={styles.flatItemText}>{item.name}</Text>
+                                    {
+                                        getVictories(item)
+                                            ?
+                                            <ImageBackground style={styles.bgVictories} source={Trofeu} >
+                                                <Text style={styles.textCountVictories}>{getVictories(item)}x</Text>
+                                            </ImageBackground>
+                                            : false}
+                                    <View style={styles.flatItemButtons}>
+                                        <TouchableOpacity
+                                            style={styles.flatItemButton}
+                                            onPress={() => selectPlayer(item)}>
+                                            <AntDesign
+                                                name={item.checked ? "checkcircle" : "checkcircleo"} size={20}
+                                                color={item.checked ? "green" : "silver"} />
+                                        </TouchableOpacity>
+                                        <TouchableOpacity
+                                            onPress={() => removePlayer(item)}>
+                                            <MaterialIcons name="delete-forever" size={25} color="red" />
+                                        </TouchableOpacity>
+                                    </View>
+                                </View>
+                            )} />
+
+                        <View style={styles.form}>
+                            <TextInput
+                                style={styles.input}
+                                placeholderTextColor="#999"
+                                autoCorrect={true}
+                                placeholder="Adicione um novo jogador"
+                                maxLength={25}
+                                value={newPlayer.name}
+                                onChangeText={(name) => setNewPlayer({ name })} />
+                            <TouchableOpacity style={styles.botton} onPress={addPlayer}>
+                                <Ionicons name="ios-add" size={24} color="white" />
+                            </TouchableOpacity>
+                        </View>
+
+                        <Text style={styles.textTitle}>Tipo de cartas</Text>
+                        <View style={styles.containerOptions}>
+                            <Option opt={'Animais'} value={"animals"} selected={optionCard} onSelect={selectOptionCard} />
+                            <Option opt={'Símbolos'} value={"simbols"} selected={optionCard} onSelect={selectOptionCard} />
+                            <Option opt={'Carros'} value={"cars"} selected={optionCard} onSelect={selectOptionCard} />
+                        </View>
+
+                        <Text style={styles.textTitle}>Pré-visualizar cartas?</Text>
+                        <View style={styles.containerOptions}>
+                            <Option opt={'Sim'} value={true} selected={optionPreview} onSelect={selectOptionPreview} />
+                            <Option opt={'Não'} value={false} selected={optionPreview} onSelect={selectOptionPreview} />
+                        </View>
+
                     </View>
 
-                    <Text style={styles.textTitle}>Hanking</Text>
-
-                    <FlatList
-                        style={styles.flatList}
-                        data={players}
-                        keyExtractor={(_, index) => index.toString()}
-                        showsVerticalScrollIndicator={false}
-                        renderItem={({ item }) => (
-                            <View style={styles.flatItem}>
-                                <Text style={styles.flatItemText}>{item.name}</Text>
-                                {
-                                    getVictories(item)
-                                        ?
-                                        <ImageBackground style={styles.bgVictories} source={Trofeu} >
-                                            <Text style={styles.textCountVictories}>{getVictories(item)}x</Text>
-                                        </ImageBackground>
-                                        : false}
-                                <View style={styles.flatItemButtons}>
-                                    <TouchableOpacity
-                                        style={styles.flatItemButton}
-                                        onPress={() => selectPlayer(item)}>
-                                        <AntDesign
-                                            name={item.checked ? "checkcircle" : "checkcircleo"} size={20}
-                                            color={item.checked ? "green" : "silver"} />
-                                    </TouchableOpacity>
-                                    <TouchableOpacity
-                                        onPress={() => removePlayer(item)}>
-                                        <MaterialIcons name="delete-forever" size={25} color="red" />
-                                    </TouchableOpacity>
-                                </View>
-                            </View>
-                        )} />
-
-                    <View style={styles.form}>
-                        <TextInput
-                            style={styles.input}
-                            placeholderTextColor="#999"
-                            autoCorrect={true}
-                            placeholder="Adicione um novo jogador"
-                            maxLength={25}
-                            value={newPlayer.name}
-                            onChangeText={(name) => setNewPlayer({ name })} />
-                        <TouchableOpacity style={styles.botton} onPress={addPlayer}>
-                            <Ionicons name="ios-add" size={24} color="white" />
+                    <View style={styles.footer}>
+                        <TouchableOpacity onPress={() => toGame()} onLongPress={() => resetData()}>
+                            <Text style={styles.buttonStart}> Iniciar jogo </Text>
                         </TouchableOpacity>
                     </View>
 
-                    <Text style={styles.textTitle}>Tipo de cartas</Text>
-                    <View style={styles.containerOptions}>
-                        <Option opt={'Animais'} value={"animals"} selected={optionCard} onSelect={selectOptionCard} />
-                        <Option opt={'Símbolos'} value={"simbols"} selected={optionCard} onSelect={selectOptionCard} />
-                        <Option opt={'Carros'} value={"cars"} selected={optionCard} onSelect={selectOptionCard} />
-                    </View>
-
-                    <Text style={styles.textTitle}>Pré-visualizar cartas?</Text>
-                    <View style={styles.containerOptions}>
-                        <Option opt={'Sim'} value={true} selected={optionPreview} onSelect={selectOptionPreview} />
-                        <Option opt={'Não'} value={false} selected={optionPreview} onSelect={selectOptionPreview} />
-                    </View>
-
+                    {isProduction ? <BannerAdMobBanner /> : false}
                 </View>
-
-                <View style={styles.footer}>
-                    <TouchableOpacity onPress={() => toGame()} onLongPress={() => resertar()}>
-                        <Text style={styles.buttonStart}> Iniciar jogo </Text>
-                    </TouchableOpacity>
-                </View>
-
-
-                {isProduction ? <BannerAdMobBanner /> : false}
-            </View>
-
+            </KeyboardAvoidingView>
         </>
     )
 }

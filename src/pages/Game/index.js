@@ -3,6 +3,7 @@ import { StyleSheet, View, Text, Alert, TouchableOpacity, AsyncStorage } from 'r
 import { createCardBoard, wonGame, closeBoard } from './../../functions'
 import Board from '../../components/Board'
 import { BannerAdMobBanner } from '../../components/BannerAdMob'
+import params from '../../params';
 
 const Relogio = props => {
 
@@ -53,7 +54,12 @@ const isProduction = false;
 
 export default props => {
 
-    const [rows, columns] = [3, 2];//props.route.params.optionLevel
+    const PLAYERS_STORAGA_NAME = params.payerStorageName
+    const RANKINGS_STORAGA_NAME = params.rankingsStorageName
+
+    const optionLevel = props.route.params.optionLevel.join(":").toString()
+
+    const [rows, columns] = props.route.params.optionLevel
     const showPreview = props.route.params.optionPreview
     const pathImage = props.route.params.optionCard
     const players = props.route.params.players
@@ -75,21 +81,20 @@ export default props => {
 
     const selecteds = [];
 
-
     useEffect(() => {
         async function loadRankings() {
-            const rankingsStorage = await AsyncStorage.getItem('rankings');
-            debugger
+            const rankingsStorage = await AsyncStorage.getItem(RANKINGS_STORAGA_NAME);
             try {
                 if (rankingsStorage) {
                     let objRankings = JSON.parse(rankingsStorage)
                     if (!objRankings.length) {
-                        objRankings.push({ id: '4:3', players: [] })
-
+                        objRankings.push({ id: optionLevel, players: [] })
+                    } else if (objRankings.filter(level => level.id == optionLevel).length === 0) {
+                        objRankings.push({ id: optionLevel, players: [] })
                     }
                     setRankings(objRankings);
                 }
-            } catch (e) { console.log("ERRO>>> " + e) }
+            } catch (e) { console.log("ERRO loadRankings GAME >>> " + e) }
 
         }
         loadRankings();
@@ -97,19 +102,6 @@ export default props => {
         newGame(showPreview, true)
         dataGame.setHours(0, 0, 0, 0)
     }, [])
-
-    /*useEffect(() => {
-        async function saveStorage() {
-            debugger
-            try {
-                AsyncStorage.setItem('rankings', JSON.stringify(rankings))
-            } catch (e) { console.log("ERRO>>> " + e) }
-        }
-        debugger
-        if (finishGame) {
-            saveStorage();
-        }
-    }, [rankings])*/
 
     function startGame() {
         const newBoard = closeBoard(board)
@@ -137,38 +129,38 @@ export default props => {
             props.route.params.onLoadingRankings();
         }
 
-        if (!hasNextGame) return
+        /* if (!hasNextGame) return
         const newBoard = createCardBoard(rows, columns, pathImage, showOpenedCards)
         selecteds.splice(0, selecteds.length)
         countAttempts.value = 0
         pointsGame.value = 0
         dataGame.setHours(0, 0, 0, 0)
-        //setFinishGame(false)                    
-        setBoard(newBoard)
+        //setFinishGame(false)   
+        setBoard(newBoard) */
 
-        /*
-                Alert.alert("Atenção", msg,
-                    [{
-                        text: "Ok", onPress: () => {
-        
-                            if (!hasNextGame) return
-                            const newBoard = createCardBoard(rows, columns, pathImage, showOpenedCards)
-                            selecteds.splice(0, selecteds.length)
-                            countAttempts.value = 0
-                            pointsGame.value = 0
-                            dataGame.setHours(0, 0, 0, 0)
-                            //setFinishGame(false)                    
-                            setBoard(newBoard)
-        
-                        }
-                    }],
-                    { cancelable: false }
-                )*/
+
+        Alert.alert("Atenção", msg,
+            [{
+                text: "Ok", onPress: () => {
+
+                    if (!hasNextGame) return
+                    const newBoard = createCardBoard(rows, columns, pathImage, showOpenedCards)
+                    selecteds.splice(0, selecteds.length)
+                    countAttempts.value = 0
+                    pointsGame.value = 0
+                    dataGame.setHours(0, 0, 0, 0)
+                    //setFinishGame(false)                    
+                    setBoard(newBoard)
+
+                }
+            }],
+            { cancelable: false }
+        )
 
     }
 
     function calculeRanking() {
-        let winPlayer = clonePlayers[0];
+        let winPlayer = { ...clonePlayers[0], victories: 0 }
         for (var i = 0; i < clonePlayers.length; i++) {
             if (clonePlayers[i].points > winPlayer.points) {
                 winPlayer = clonePlayers[i]
@@ -178,24 +170,20 @@ export default props => {
     }
 
     async function saveRanking(winPlayer) {
-        
         const newRankings = rankings.map(level => {
-            if (level.id != '4:3') {
+            if (level.id != optionLevel) {
                 return { ...level }
             }
-            let newPlayers = winPlayer;
-            debugger
             if (!level.players.length) {
                 winPlayer.victories = 1
-                return { ...level, players: [newPlayers] }
+                return { ...level, players: [winPlayer] }
             }
 
-            if ( level.players.filter(player => player.id == winPlayer.id ).length === 0 ) {
+            if (level.players.filter(player => player.id == winPlayer.id).length === 0) {
                 level.players.push(winPlayer)
             }
-            debugger
+
             let newPlayers = level.players.map(player => {
-                debugger
                 if (player.id == winPlayer.id) {
                     return { ...player, victories: player.victories + 1 }
                 } else {
@@ -205,17 +193,13 @@ export default props => {
 
             return { ...level, players: newPlayers }
         })
-        debugger
-        //setRankings(newRankings)
 
-        await AsyncStorage.setItem('rankings', JSON.stringify(newRankings))        
+        await AsyncStorage.setItem(RANKINGS_STORAGA_NAME, JSON.stringify(newRankings))
     }
 
     async function testeFinish() {
-        console.log('teste finish')
         await saveRanking(players[1])
-        debugger        
-        props.route.params.onLoadingRankings();        
+        props.route.params.onLoadingRankings();
         props.navigation.goBack(null)
     }
 
@@ -294,9 +278,9 @@ export default props => {
                 <View style={styles.board}>
                     <Board board={board} onOpenSelect={onOpenSelect} />
                 </View>
-                <TouchableOpacity onPress={testeFinish}>
+                {/*<TouchableOpacity onPress={testeFinish}>
                     <Text>Teste</Text>
-                </TouchableOpacity>
+                </TouchableOpacity> */ }
             </View>
 
             {isProduction ? <BannerAdMobBanner /> : false}

@@ -7,6 +7,8 @@ const params = {
 	fontSize: 15,
 	headerRatio: 0.25,
 	difficultLevel: 0.1,
+    payerStorageName: "st_players", 
+    rankingsStorageName: "st_rankings",
 	getColumnsAmount(){
 		const width = Dimensions.get('window').width
 		console.log("GET>> " + this.blockSizeWidth )
