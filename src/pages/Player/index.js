@@ -17,32 +17,71 @@ export default props => {
 
     const [players, setPlayers] = useState([]);
     const [rankings, setRankings] = useState([]);
+
     const [newPlayer, setNewPlayer] = useState(initialPlayer);
     const [optionLevel, setOptionLevel] = useState([4, 3]);
     const [optionCard, setOptionCard] = useState('animals');
     const [optionPreview, setOptionPreview] = useState(false);
     const countPlays = useRef(0);
 
-    //AsyncStorage.removeItem('players')
-    //AsyncStorage.removeItem('rankings')
+    const rankingsRef = useRef({value: []}).current;
 
     async function loadRankings() {
         const rankingsStorage = await AsyncStorage.getItem('rankings');
         if (rankingsStorage) {
-            setRankings(JSON.parse(rankingsStorage));
+            rankingsRef.value = JSON.parse(rankingsStorage)
+            setRankings(rankingsRef.value);
         }
     }
 
+    function sortPlayers(a, b){
+        debugger
+        const rk = rankingsRef.value;
+        const rkCurrent = rk.filter(level => level.id == optionLevel.join(':') )[0]
+
+        if ( rkCurrent ){
+            if ( rkCurrent.players.length ) {
+                let pa = rkCurrent.players.filter(p => p.id == a.id )
+                let pb = rkCurrent.players.filter(p => p.id == b.id )
+                if ( pa.length && pb.length ) {
+                    if (pa.victories > pb.victories) {
+                        return 1;
+                      }
+                      if (pa.victories < pb.victories) {
+                        return -1;
+                      }
+                      // a must be equal to b
+                      return 0;
+                } else if ( pa.length ) {
+                    return 1
+                } else if ( pb.length ) {
+                    return -1
+                } else {
+                    return 0
+                }
+            }   
+        }
+        
+        
+    }
     async function loadPlayers() {
         const playersStorage = await AsyncStorage.getItem('players');
+    
         if (playersStorage) {
+            const newPlayersStorage = JSON.parse(playersStorage);
+            newPlayersStorage.sort(sortPlayers)
             setPlayers(JSON.parse(playersStorage));
         }
     }
 
+    function resertar() {
+        AsyncStorage.removeItem('players')
+        AsyncStorage.removeItem('rankings')
+    }
+
     useEffect(() => {
-        loadPlayers();
         loadRankings();
+        loadPlayers();
     }, [])
 
     useEffect(() => {
@@ -117,7 +156,8 @@ export default props => {
             [{ text: "Cancelar", onPress: () => { return }, style: "cancel" },
             {
                 text: "Ok", onPress: () => {
-                    setTasks(players.filter(player => player.id !== item.id))
+                    setPlayers(players.filter(player => player.id !== item.id))
+                    removePlayerRankings(item)
                 }
             },
             ],
@@ -125,19 +165,17 @@ export default props => {
         )
     }
 
-    async function removePlayerStorage() {
-        Alert.alert("Deletar Todas???", "Tem certeza que deseja remover todos os jogadores?",
-            [{ text: "Cancelar", onPress: () => { return }, style: "cancel" },
-            {
-                text: "Ok", onPress: () => {
-                    AsyncStorage.removeItem('players')
-                    setPlayers([])
-                }
+    function removePlayerRankings(item) {
+        const newRankings = rankings.map(level => {
+            if (!level.players.length) {
+                return { ...level }
             }
-            ],
-            { cancelable: false }
-        )
+            const newPlayers = level.players.filter(player => player.id != item.id)
 
+            return { ...level, players: newPlayers }
+        })
+
+        setRankings(newRankings)
     }
 
     async function toGame() {
@@ -150,7 +188,7 @@ export default props => {
     }
 
     function getVictories(item) {
-        debugger
+
         const indiceOptLevel = optionLevel.join(':');
         const rkPlayer = rankings.filter(r => r.id == indiceOptLevel)
         if (rkPlayer.length === 0) return
@@ -204,8 +242,7 @@ export default props => {
                                             color={item.checked ? "green" : "silver"} />
                                     </TouchableOpacity>
                                     <TouchableOpacity
-                                        onPress={() => removeTask(item)}
-                                        onLongPress={removePlayerStorage}>
+                                        onPress={() => removePlayer(item)}>
                                         <MaterialIcons name="delete-forever" size={25} color="red" />
                                     </TouchableOpacity>
                                 </View>
@@ -242,7 +279,7 @@ export default props => {
                 </View>
 
                 <View style={styles.footer}>
-                    <TouchableOpacity onPress={() => toGame()}>
+                    <TouchableOpacity onPress={() => toGame()} onLongPress={() => resertar()}>
                         <Text style={styles.buttonStart}> Iniciar jogo </Text>
                     </TouchableOpacity>
                 </View>

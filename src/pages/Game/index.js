@@ -75,9 +75,11 @@ export default props => {
 
     const selecteds = [];
 
+
     useEffect(() => {
         async function loadRankings() {
             const rankingsStorage = await AsyncStorage.getItem('rankings');
+            debugger
             try {
                 if (rankingsStorage) {
                     let objRankings = JSON.parse(rankingsStorage)
@@ -96,14 +98,18 @@ export default props => {
         dataGame.setHours(0, 0, 0, 0)
     }, [])
 
-    useEffect(() => {
+    /*useEffect(() => {
         async function saveStorage() {
+            debugger
             try {
                 AsyncStorage.setItem('rankings', JSON.stringify(rankings))
             } catch (e) { console.log("ERRO>>> " + e) }
         }
-        saveStorage();
-    }, [rankings])
+        debugger
+        if (finishGame) {
+            saveStorage();
+        }
+    }, [rankings])*/
 
     function startGame() {
         const newBoard = closeBoard(board)
@@ -126,7 +132,7 @@ export default props => {
         } else {
             let winPlayer = calculeRanking();
             saveRanking(winPlayer)
-            msg += `\npartida finalizada`            
+            msg += `\npartida finalizada`
             props.navigation.goBack(null)
             props.route.params.onLoadingRankings();
         }
@@ -171,20 +177,25 @@ export default props => {
         return winPlayer
     }
 
-    function saveRanking(winPlayer) {
-
+    async function saveRanking(winPlayer) {
+        
         const newRankings = rankings.map(level => {
             if (level.id != '4:3') {
                 return { ...level }
             }
             let newPlayers = winPlayer;
-
+            debugger
             if (!level.players.length) {
                 winPlayer.victories = 1
                 return { ...level, players: [newPlayers] }
             }
 
+            if ( level.players.filter(player => player.id == winPlayer.id ).length === 0 ) {
+                level.players.push(winPlayer)
+            }
+            debugger
             newPlayers = level.players.map(player => {
+                debugger
                 if (player.id == winPlayer.id) {
                     return { ...player, victories: player.victories + 1 }
                 } else {
@@ -192,10 +203,20 @@ export default props => {
                 }
             })
 
-            return { ...level, players: [newPlayers] }
+            return { ...level, players: newPlayers }
         })
+        debugger
+        //setRankings(newRankings)
 
-        setRankings(newRankings)
+        await AsyncStorage.setItem('rankings', JSON.stringify(newRankings))        
+    }
+
+    async function testeFinish() {
+        console.log('teste finish')
+        await saveRanking(players[1])
+        debugger        
+        props.route.params.onLoadingRankings();        
+        props.navigation.goBack(null)
     }
 
     function refreshPoints() {
@@ -273,6 +294,9 @@ export default props => {
                 <View style={styles.board}>
                     <Board board={board} onOpenSelect={onOpenSelect} />
                 </View>
+                <TouchableOpacity onPress={testeFinish}>
+                    <Text>Teste</Text>
+                </TouchableOpacity>
             </View>
 
             {isProduction ? <BannerAdMobBanner /> : false}
