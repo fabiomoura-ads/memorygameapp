@@ -23,19 +23,24 @@ export default props => {
     const [optionPreview, setOptionPreview] = useState(false);
     const countPlays = useRef(0);
 
+    //AsyncStorage.removeItem('players')
+    //AsyncStorage.removeItem('rankings')
+
+    async function loadRankings() {
+        const rankingsStorage = await AsyncStorage.getItem('rankings');
+        if (rankingsStorage) {
+            setRankings(JSON.parse(rankingsStorage));
+        }
+    }
+
+    async function loadPlayers() {
+        const playersStorage = await AsyncStorage.getItem('players');
+        if (playersStorage) {
+            setPlayers(JSON.parse(playersStorage));
+        }
+    }
+
     useEffect(() => {
-        async function loadPlayers() {
-            const playersStorage = await AsyncStorage.getItem('players');
-            if (playersStorage) {
-                setPlayers(JSON.parse(playersStorage));
-            }
-        }
-        async function loadRankings() {
-            const rankingsStorage = await AsyncStorage.getItem('rankings');
-            if (rankingsStorage) {
-                setRankings(JSON.parse(rankingsStorage));
-            }
-        }
         loadPlayers();
         loadRankings();
     }, [])
@@ -51,6 +56,7 @@ export default props => {
         async function saveStorage() {
             AsyncStorage.setItem('rankings', JSON.stringify(rankings))
         }
+
         saveStorage();
     }, [rankings])
 
@@ -78,11 +84,11 @@ export default props => {
 
     function addPlayer() {
         if (!newPlayer.name) return;
+
         if (players.length === 3) {
             Alert.alert(`Atenção!`, `Já existe o limite máximo de jogadores cadastrados!`)
             return;
         }
-
 
         const exists = players.filter(player => player.name.toString() === newPlayer.name.toString()).length !== 0
         if (exists) {
@@ -140,7 +146,21 @@ export default props => {
             await ShowAdMobInterstitial();
             countPlays.current = 0;
         }
-        props.navigation.navigate('Game', { optionLevel, optionCard, optionPreview, players })
+        props.navigation.navigate('Game', { optionLevel, optionCard, optionPreview, players, onLoadingRankings: loadRankings })
+    }
+
+    function getVictories(item) {
+        debugger
+        const indiceOptLevel = optionLevel.join(':');
+        const rkPlayer = rankings.filter(r => r.id == indiceOptLevel)
+        if (rkPlayer.length === 0) return
+        let qtdVictories = 0;
+        rkPlayer[0].players.map(player => {
+            if (player.id == item.id) {
+                qtdVictories = player.victories
+            }
+        })
+        return qtdVictories;
     }
 
     return (
@@ -168,9 +188,13 @@ export default props => {
                         renderItem={({ item }) => (
                             <View style={styles.flatItem}>
                                 <Text style={styles.flatItemText}>{item.name}</Text>
-                                <ImageBackground style={styles.bgVictories} source={Trofeu} >
-                                    <Text style={styles.textCountVictories}>4x</Text>
-                                </ImageBackground>
+                                {
+                                    getVictories(item)
+                                        ?
+                                        <ImageBackground style={styles.bgVictories} source={Trofeu} >
+                                            <Text style={styles.textCountVictories}>{getVictories(item)}x</Text>
+                                        </ImageBackground>
+                                        : false}
                                 <View style={styles.flatItemButtons}>
                                     <TouchableOpacity
                                         style={styles.flatItemButton}

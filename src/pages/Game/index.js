@@ -15,11 +15,7 @@ const Relogio = props => {
     }
 
     useEffect(() => {
-        const idInterval = setInterval(() => {
-            setTime(time.setSeconds(time.getSeconds() + 1))
-        }, 1000)
-
-        idIntervalRef.current = idInterval;
+        schedullerTimer()
 
         return function () {
             setTime(time.setHours(0, 0, 0, 0))
@@ -28,16 +24,27 @@ const Relogio = props => {
 
     }, [])
 
+    function schedullerTimer() {
+        const idInterval = setInterval(() => {
+            setTime(time.setSeconds(time.getSeconds() + 1))
+        }, 1000)
+
+        idIntervalRef.current = idInterval;
+    }
+
     useEffect(() => {
         if (props.finishGame) {
             clearInterval(idIntervalRef.current)
+            idIntervalRef.current = null;
+        } else if (!idIntervalRef.current) {
+            schedullerTimer()
         }
     }, [time])
 
     return (
         <View style={styles.headerTime}>
             <Text style={styles.textHeaderTime}>Pontos: {props.pointsGame} </Text>
-            <Text style={styles.textHeaderTime}>Tempo: {retornaDataFormatada()}</Text>
+            { /*<Text style={styles.textHeaderTime}>Tempo: {retornaDataFormatada()}</Text> */}
         </View>
     )
 }
@@ -46,10 +53,11 @@ const isProduction = false;
 
 export default props => {
 
-    const [rows, columns] = props.route.params.optionLevel
+    const [rows, columns] = [3, 2];//props.route.params.optionLevel
     const showPreview = props.route.params.optionPreview
     const pathImage = props.route.params.optionCard
     const players = props.route.params.players
+    const clonePlayers = useRef([...players]).current
 
     const [board, setBoard] = useState([[]]);
     const [finishGame, setFinishGame] = useState(false);
@@ -59,34 +67,40 @@ export default props => {
     dataBase.setHours(0, 0, 0, 0);
     const dataGame = useRef(dataBase).current;
 
-    const playerCurrent = useRef({ player_id: 0 }).current
-    console.log("Players" + players);
+    const playerCurrent = useRef({ position: 0 }).current
     const countAttempts = useRef({ value: 0 }).current;
     const pointsGame = useRef({ value: 0 }).current;
 
-    const [rankings, setRankings] = useState([]);
+    const [rankings, setRankings] = useState([[]]);
 
     const selecteds = [];
 
     useEffect(() => {
         async function loadRankings() {
             const rankingsStorage = await AsyncStorage.getItem('rankings');
-            if (rankingsStorage) {
-                setRankings(JSON.parse(rankingsStorage));
-            }
+            try {
+                if (rankingsStorage) {
+                    let objRankings = JSON.parse(rankingsStorage)
+                    if (!objRankings.length) {
+                        objRankings.push({ id: '4:3', players: [] })
+
+                    }
+                    setRankings(objRankings);
+                }
+            } catch (e) { console.log("ERRO>>> " + e) }
+
         }
         loadRankings();
 
-        newGame(showPreview)
+        newGame(showPreview, true)
         dataGame.setHours(0, 0, 0, 0)
     }, [])
 
     useEffect(() => {
-        console.log('Salvando rankings')
         async function saveStorage() {
             try {
-                AsyncStorage.setItem('rankings', JSON.stringify(hankings))
-            } catch (e) { }
+                AsyncStorage.setItem('rankings', JSON.stringify(rankings))
+            } catch (e) { console.log("ERRO>>> " + e) }
         }
         saveStorage();
     }, [rankings])
@@ -97,20 +111,90 @@ export default props => {
         setGameInitialized(true);
     }
 
-    function newGame(showOpenedCards) {
+    function newGame(showOpenedCards, firstPlayer) {
+        // \nTempo: ${ dataGame.getMinutes() ? dataGame.getMinutes() + ' minutos e ' : ''} ${dataGame.getSeconds()} segundos
+        let msg = ""
+        let hasNextGame = false
+        if (!firstPlayer) {
+            msg = `Partida encerrada!             
+            \nPontos: ${ pointsGame.value} `
+        }
+
+        if (players instanceof Array && players[playerCurrent.position] != null) {
+            msg += `\nIniciando partida do jogador ${players[playerCurrent.position].name} `
+            hasNextGame = true
+        } else {
+            let winPlayer = calculeRanking();
+            saveRanking(winPlayer)
+            msg += `\npartida finalizada`            
+            props.navigation.goBack(null)
+            props.route.params.onLoadingRankings();
+        }
+
+        if (!hasNextGame) return
         const newBoard = createCardBoard(rows, columns, pathImage, showOpenedCards)
         selecteds.splice(0, selecteds.length)
+        countAttempts.value = 0
+        pointsGame.value = 0
+        dataGame.setHours(0, 0, 0, 0)
+        //setFinishGame(false)                    
         setBoard(newBoard)
+
+        /*
+                Alert.alert("Atenção", msg,
+                    [{
+                        text: "Ok", onPress: () => {
+        
+                            if (!hasNextGame) return
+                            const newBoard = createCardBoard(rows, columns, pathImage, showOpenedCards)
+                            selecteds.splice(0, selecteds.length)
+                            countAttempts.value = 0
+                            pointsGame.value = 0
+                            dataGame.setHours(0, 0, 0, 0)
+                            //setFinishGame(false)                    
+                            setBoard(newBoard)
+        
+                        }
+                    }],
+                    { cancelable: false }
+                )*/
+
     }
 
-    function saveRanking() {
-        const newRankings = rankings.map(ranking => {
-            if (ranking.player_id == props.playser_id) {
-                return { ...ranking, victories: ranking.victories++ }
-            } else {
-                return { ...ranking }
+    function calculeRanking() {
+        let winPlayer = clonePlayers[0];
+        for (var i = 0; i < clonePlayers.length; i++) {
+            if (clonePlayers[i].points > winPlayer.points) {
+                winPlayer = clonePlayers[i]
             }
+        }
+        return winPlayer
+    }
+
+    function saveRanking(winPlayer) {
+
+        const newRankings = rankings.map(level => {
+            if (level.id != '4:3') {
+                return { ...level }
+            }
+            let newPlayers = winPlayer;
+
+            if (!level.players.length) {
+                winPlayer.victories = 1
+                return { ...level, players: [newPlayers] }
+            }
+
+            newPlayers = level.players.map(player => {
+                if (player.id == winPlayer.id) {
+                    return { ...player, victories: player.victories + 1 }
+                } else {
+                    return { ...player }
+                }
+            })
+
+            return { ...level, players: [newPlayers] }
         })
+
         setRankings(newRankings)
     }
 
@@ -165,19 +249,17 @@ export default props => {
             setBoard(newBoard);
 
             if (wonGame(newBoard)) {
-                showMessageFinish()
-                setFinishGame(true);
-                saveRanking();
+                clonePlayers.forEach(player => {
+                    if (player.id === players[playerCurrent.position].id) {
+                        player.points = pointsGame.value
+                        //player.time = (dataGame.getMinutes() * 60 + dataGame.getSeconds())
+                    }
+                })
+                playerCurrent.position++;
+                setFinishGame(true)
+                newGame(showPreview);
             }
         }
-    }
-
-    function showMessageFinish() {
-        let msg = `Partida encerrada! 
-        \nTempo: ${ dataGame.getMinutes() ? dataGame.getMinutes() + ' minutos e ' : ''} ${dataGame.getSeconds()} segundos
-        \nPontos: ${ pointsGame.value} 
-        \n\nPreparando tabuleiro para o próximo jogador `
-        Alert.alert('Parabéns!', msg)
     }
 
     return (
