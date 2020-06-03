@@ -194,7 +194,7 @@ export default props => {
                 level.players.push(winPlayer)
             }
             debugger
-            newPlayers = level.players.map(player => {
+            let newPlayers = level.players.map(player => {
                 debugger
                 if (player.id == winPlayer.id) {
                     return { ...player, victories: player.victories + 1 }
