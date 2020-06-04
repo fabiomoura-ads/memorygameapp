@@ -1,13 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity, AsyncStorage, KeyboardAvoidingView, Platform, FlatList, TextInput, Keyboard, Alert, ImageBackground } from 'react-native'
 import { BannerAdMobBanner } from '../../components/BannerAdMob'
-import { AdMobInterstitial } from 'expo-ads-admob'
 import { Ionicons, MaterialIcons, AntDesign } from '@expo/vector-icons';
 import Option from '../../components/Option'
 import Trofeu from '../../images/trofeu.png';
 import params from '../../params';
-
-const isProduction = false;
 
 const initialPlayer = { id: 0, name: '' }
 
@@ -21,37 +18,32 @@ export default props => {
     const [rankings, setRankings] = useState([]);
 
     const [optionLevel, setOptionLevel] = useState([4, 3]);
-    const [optionCard, setOptionCard] = useState('animals');
-    const [optionPreview, setOptionPreview] = useState(false);
-
-    const countPlays = useRef(0);
-
+       
     useEffect(() => {
-        loadRankings();
         loadPlayers();
     }, [])
 
     useEffect(() => {
-        async function saveStorage() {
+        async function savePlayersStorage() {
             AsyncStorage.setItem(PLAYERS_STORAGA_NAME, JSON.stringify(players))
         }
-        saveStorage();
+        savePlayersStorage();
     }, [players])
 
     useEffect(() => {
-        async function saveStorage() {
+        async function saveRankingsStorage() {
             AsyncStorage.setItem(RANKINGS_STORAGA_NAME, JSON.stringify(rankings))
         }
 
-        saveStorage();
+        saveRankingsStorage();
     }, [rankings])
 
     useEffect(() => {
-        async function load() {
-            await AdMobInterstitial.setAdUnitID('ca-app-pub-3966719253606702/1496212326')
-        }
-        //load();
-    })
+        const unsubscribe = props.navigation.addListener('focus', () => {
+            loadRankings();
+        });
+        return unsubscribe;
+    }, [props.navigation]);
 
     async function loadRankings() {
         const rankingsStorage = await AsyncStorage.getItem(RANKINGS_STORAGA_NAME);
@@ -66,32 +58,25 @@ export default props => {
             setPlayers(JSON.parse(playersStorage));
         }
     }
-
+        
     function resetData() {
         AsyncStorage.removeItem(PLAYERS_STORAGA_NAME)
         AsyncStorage.removeItem(RANKINGS_STORAGA_NAME)
+        Alert.alert('Atenção!', 'Dados resetados!')
+        loadPlayers();
+        loadRankings()
+        setPlayers([])
     }
 
     function selectOptionLevel(opt) {
         setOptionLevel(opt)
-    }
-    function selectOptionCard(opt) {
-        setOptionCard(opt)
-    }
-    function selectOptionPreview(opt) {
-        setOptionPreview(opt)
-    }
-
-    async function ShowAdMobInterstitial() {
-        await AdMobInterstitial.requestAdAsync({ servePersonalizedAds: true })
-        await AdMobInterstitial.showAdAsync();
     }
 
     function addPlayer() {
         if (!newPlayer.name) return;
 
         if (players.length === 3) {
-            Alert.alert(`Atenção!`, `Já existe o limite máximo de jogadores cadastrados!`)
+            Alert.alert(`Atenção!`, `Limite máximo de 3 jogadores!`)
             return;
         }
 
@@ -144,13 +129,13 @@ export default props => {
         setRankings(newRankings)
     }
 
-    async function toGame() {
-        countPlays.current++;
-        if (countPlays.current == 3 && isProduction) {
-            await ShowAdMobInterstitial();
-            countPlays.current = 0;
+    async function toCards() {
+        const playersSelected = players.filter(player => player.checked)
+        if ( !playersSelected.length ) {
+            Alert.alert('Atenção!', 'Nenhum jogador foi selecionado.')
+            return;
         }
-        props.navigation.navigate('Game', { optionLevel, optionCard, optionPreview, players, onLoadingRankings: loadRankings })
+        props.navigation.navigate('Cards', { optionLevel, playersSelected })
     }
 
     function getVictories(player) {
@@ -188,8 +173,8 @@ export default props => {
                             <Option opt={[6, 6]} value={[6, 6]} selected={optionLevel} onSelect={selectOptionLevel} />
                         </View>
 
-                        <Text style={styles.textTitle}>Hanking</Text>
-
+                        { players.length ? <Text style={styles.textTitle}>Vitórias</Text> : false }
+                        
                         <FlatList
                             style={styles.flatList}
                             data={players}
@@ -210,17 +195,20 @@ export default props => {
                                             style={styles.flatItemButton}
                                             onPress={() => selectPlayer(item)}>
                                             <AntDesign
-                                                name={item.checked ? "checkcircle" : "checkcircleo"} size={20}
-                                                color={item.checked ? "green" : "silver"} />
+                                                name={item.checked ? "checkcircle" : "checkcircleo"} size={25}
+                                                color={item.checked ? "green" : "#ccc"} />
                                         </TouchableOpacity>
                                         <TouchableOpacity
                                             onPress={() => removePlayer(item)}>
-                                            <MaterialIcons name="delete-forever" size={25} color="red" />
+                                            <MaterialIcons name="delete-forever" size={30} color="red" />
                                         </TouchableOpacity>
                                     </View>
                                 </View>
                             )} />
 
+                    </View>
+
+                    <View style={styles.footer}>
                         <View style={styles.form}>
                             <TextInput
                                 style={styles.input}
@@ -231,32 +219,16 @@ export default props => {
                                 value={newPlayer.name}
                                 onChangeText={(name) => setNewPlayer({ name })} />
                             <TouchableOpacity style={styles.botton} onPress={addPlayer}>
-                                <Ionicons name="ios-add" size={24} color="white" />
+                                <Ionicons name="ios-add" size={30} color="#fff" />
                             </TouchableOpacity>
                         </View>
 
-                        <Text style={styles.textTitle}>Tipo de cartas</Text>
-                        <View style={styles.containerOptions}>
-                            <Option opt={'Animais'} value={"animals"} selected={optionCard} onSelect={selectOptionCard} />
-                            <Option opt={'Símbolos'} value={"simbols"} selected={optionCard} onSelect={selectOptionCard} />
-                            <Option opt={'Carros'} value={"cars"} selected={optionCard} onSelect={selectOptionCard} />
-                        </View>
-
-                        <Text style={styles.textTitle}>Pré-visualizar cartas?</Text>
-                        <View style={styles.containerOptions}>
-                            <Option opt={'Sim'} value={true} selected={optionPreview} onSelect={selectOptionPreview} />
-                            <Option opt={'Não'} value={false} selected={optionPreview} onSelect={selectOptionPreview} />
-                        </View>
-
-                    </View>
-
-                    <View style={styles.footer}>
-                        <TouchableOpacity onPress={() => toGame()} onLongPress={() => resetData()}>
-                            <Text style={styles.buttonStart}> Iniciar jogo </Text>
+                        <TouchableOpacity onPress={() => toCards()} onLongPress={() => resetData()}>
+                            <Text style={styles.buttonStart}> Avançar </Text>
                         </TouchableOpacity>
                     </View>
 
-                    {isProduction ? <BannerAdMobBanner /> : false}
+                   <BannerAdMobBanner />
                 </View>
             </KeyboardAvoidingView>
         </>
@@ -283,7 +255,7 @@ const styles = StyleSheet.create({
         justifyContent: "space-around",
     },
     footer: {
-        flex: 1,
+        flex: 2,
         alignItems: "center",
         justifyContent: "center",
         marginBottom: 5
@@ -347,39 +319,41 @@ const styles = StyleSheet.create({
         padding: 2,
     },
     flatItem: {
-        backgroundColor: "#ffc77d",
+        backgroundColor: "#F2B277",
         marginBottom: 2,
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
-        //paddingBottom: 13,
         borderRadius: 4,
-        borderWidth: 1,
-        borderColor: "#eee"
+        borderWidth: 2,
+        height: 40,
+        borderColor: "#ffc77d",
+        borderBottomColor: "#F76301",
     },
     flatItemButtons: {
         flexDirection: "row",
         alignItems: "center"
     },
     flatItemText: {
-        fontSize: 14,
-        color: "#333",
+        fontSize: 16,
+        color: "#004",
         fontWeight: "bold",
-        marginLeft: 3,
+        fontStyle: "italic",
+        marginLeft: 5,
         textAlign: "center"
 
     },
     flatItemButton: {
-        marginRight: 20
+        marginRight: 15
     },
     bgVictories: {
-        width: 30,
-        height: 35,
+        width: 45,
+        height: 40,
         resizeMode: 'stretch',
     },
     textCountVictories: {
-        fontSize: 12,
-        marginTop: 1,
+        fontSize: 15,
+        marginTop: 2,
         fontWeight: "bold",
         color: "green",
         textAlign: "center"
@@ -387,6 +361,8 @@ const styles = StyleSheet.create({
     form: {
         padding: 8,
         height: 80,
+        width: "90%",
+        alignItems: "center",
         justifyContent: "center",
         alignSelf: "stretch",
         flexDirection: "row",
@@ -395,7 +371,8 @@ const styles = StyleSheet.create({
         borderColor: "#eee",
     },
     input: {
-        height: 40,
+        height: 35,
+        marginLeft: 30,
         backgroundColor: "#eee",
         borderRadius: 4,
         paddingVertical: 5,
@@ -404,8 +381,8 @@ const styles = StyleSheet.create({
         borderColor: "#eee"
     },
     botton: {
-        width: 40,
-        height: 40,
+        width: 35,
+        height: 35,
         justifyContent: "center",
         alignItems: "center",
         backgroundColor: "#FF5733",

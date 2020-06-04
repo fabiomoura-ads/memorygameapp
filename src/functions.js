@@ -131,7 +131,28 @@ const getImage = (fullPathImage) => {
         case "cars/17.png": return require('./images/cars/17.png')
         case "cars/18.png": return require('./images/cars/18.png')
         case "cars/19.png": return require('./images/cars/19.png')
-        
+
+        //--emojis
+        case "emojis/1.png": return require('./images/emojis/1.png')
+        case "emojis/2.png": return require('./images/emojis/2.png')
+        case "emojis/3.png": return require('./images/emojis/3.png')
+        case "emojis/4.png": return require('./images/emojis/4.png')
+        case "emojis/5.png": return require('./images/emojis/5.png')
+        case "emojis/6.png": return require('./images/emojis/6.png')
+        case "emojis/7.png": return require('./images/emojis/7.png')
+        case "emojis/8.png": return require('./images/emojis/8.png')
+        case "emojis/9.png": return require('./images/emojis/9.png')
+        case "emojis/10.png": return require('./images/emojis/10.png')
+        case "emojis/11.png": return require('./images/emojis/11.png')
+        case "emojis/12.png": return require('./images/emojis/12.png')
+        case "emojis/13.png": return require('./images/emojis/13.png')
+        case "emojis/14.png": return require('./images/emojis/14.png')
+        case "emojis/15.png": return require('./images/emojis/15.png')
+        case "emojis/16.png": return require('./images/emojis/16.png')
+        case "emojis/17.png": return require('./images/emojis/17.png')
+        case "emojis/18.png": return require('./images/emojis/18.png')
+        case "emojis/19.png": return require('./images/emojis/19.png')
+
         default:
             return require('./images/simbols/19.png')
     }

@@ -1,11 +1,12 @@
 import 'react-native-gesture-handler';
 import React from 'react';
-import { StyleSheet } from 'react-native';
 import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import Home from './src/pages/Home'
 import Game from './src/pages/Game'
 import Player from './src/pages/Player'
+import Cards from './src/pages/Cards'
+import PlayerNormal from './src/pages/PlayerNormal'
 
 const MyTheme = {
   ...DefaultTheme,
@@ -32,13 +33,16 @@ export default function App() {
             fontWeight: 'bold',
           },
         }}>
-        <Stack.Screen name="Player" component={Player} options={{ title: 'Jogo da Memória - Modo Competição' }} />
+        
         <Stack.Screen
           name="Home"
           component={Home}
           options={{ title: 'Home' }}
         />
-        <Stack.Screen name="Game" component={Game} options={{ title: 'Jogo da Memória' }} />
+        <Stack.Screen name="Player" component={Player} options={{ title: 'Modo Competição' }} />
+        <Stack.Screen name="Cards" component={Cards} options={{ title: 'Opções do Jogo' }} />
+        <Stack.Screen name="Game" component={Game} options={{ title: 'Memorizze - Jogue!' }} />
+        <Stack.Screen name="PlayerNormal" component={PlayerNormal} options={{ title: 'Opções do Jogo' }} />
 
       </Stack.Navigator>
 

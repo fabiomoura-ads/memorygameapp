@@ -3,20 +3,18 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
 import { BannerAdMobBanner } from '../../components/BannerAdMob'
 import { AdMobInterstitial } from 'expo-ads-admob'
 
-const isProduction = false;
-
 export default props => {
 
-    const [optionLevel, setOptionLevel] = useState([4, 3]);
-    const [optionCard, setOptionCard] = useState('animals');
-    const [optionPreview, setOptionPreview] = useState(false);
     const countPlays = useRef(0);
 
     useEffect(() => {
         async function load() {
+            //--teste            
+            //await AdMobInterstitial.setAdUnitID('ca-app-pub-3940256099942544/1033173712')
+            //---prod
             await AdMobInterstitial.setAdUnitID('ca-app-pub-3966719253606702/1496212326')
         }
-        //load();
+        load();
     })
 
     async function ShowAdMobInterstitial() {
@@ -24,36 +22,34 @@ export default props => {
         await AdMobInterstitial.showAdAsync();
     }
 
-    function selectOptionLevel(opt) {
-        setOptionLevel(opt)
-    }
-    function selectOptionCard(opt) {
-        setOptionCard(opt)
-    }
-    function selectOptionPreview(opt) {
-        setOptionPreview(opt)
-    }
-
-    async function toGame() {
+    async function checkShowAdMob(){
         countPlays.current++;
-        if (countPlays.current == 3 && isProduction) {
+        if (countPlays.current == 5 ) {
             await ShowAdMobInterstitial();
             countPlays.current = 0;
         }
-        props.navigation.navigate('Player', { optionLevel, optionCard, optionPreview })
+    }
+    async function toPlayer() {
+        await checkShowAdMob()
+        props.navigation.navigate('Player')
+    }
+
+    async function toGame() {
+        await checkShowAdMob()
+        props.navigation.navigate('PlayerNormal')
     }
 
     return (
         <View style={styles.container}>
 
             <View style={styles.header}>
-                <Text style={styles.title}>Jogo da Memória</Text>
+                <Text style={styles.title}>Memorizze Game</Text>
             </View>
 
             <View style={styles.body}>
 
                 <View style={styles.boxButton}>
-                    <TouchableOpacity onPress={() => toGame()}>
+                    <TouchableOpacity onPress={() => toPlayer()}>
 
                         <Text style={styles.buttonStart}>Modo Competição</Text>
 
@@ -69,7 +65,7 @@ export default props => {
                 </View>
             </View>
 
-            {isProduction ? <BannerAdMobBanner /> : false}
+            <BannerAdMobBanner />
 
         </View>
 
@@ -96,9 +92,10 @@ const styles = StyleSheet.create({
         justifyContent: "center"
     },
     title: {
-        fontSize: 35,
+        fontSize: 50,
         textAlign: "center",
         fontWeight: "bold",
+        fontStyle: "italic",
         color: "red",
     },
     textButton: {
@@ -114,7 +111,7 @@ const styles = StyleSheet.create({
         backgroundColor: "red",
         borderColor: "#ccc",
         borderRadius: 30,        
-        textAlign: "center",
+        alignItems: "center",
         justifyContent: "center",
         marginTop: 30
     },

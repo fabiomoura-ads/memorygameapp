@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { StyleSheet, View, Text, Alert, TouchableOpacity, AsyncStorage } from 'react-native';
+import { StackActions } from '@react-navigation/native';
 import { createCardBoard, wonGame, closeBoard } from './../../functions'
 import Board from '../../components/Board'
 import { BannerAdMobBanner } from '../../components/BannerAdMob'
@@ -7,10 +8,10 @@ import params from '../../params';
 
 const Relogio = props => {
 
-    const [time, setTime] = useState(props.time)
-    const idIntervalRef = useRef(0);
+    //const [time, setTime] = useState(props.time)
+    //const idIntervalRef = useRef(0);
 
-    function retornaDataFormatada() {
+    /*function retornaDataFormatada() {
         let data = new Date(time);
         return data.getHours().toString().padStart(2, '0') + ":" + data.getMinutes().toString().padStart(2, '0') + ":" + data.getSeconds().toString().padStart(2, '0')
     }
@@ -40,7 +41,7 @@ const Relogio = props => {
         } else if (!idIntervalRef.current) {
             schedullerTimer()
         }
-    }, [time])
+    }, [time])*/
 
     return (
         <View style={styles.headerTime}>
@@ -50,20 +51,17 @@ const Relogio = props => {
     )
 }
 
-const isProduction = false;
-
 export default props => {
 
     const PLAYERS_STORAGA_NAME = params.payerStorageName
     const RANKINGS_STORAGA_NAME = params.rankingsStorageName
+    const isModeCompete = props.route.params.modeCompete || null
 
     const optionLevel = props.route.params.optionLevel.join(":").toString()
 
     const [rows, columns] = props.route.params.optionLevel
     const showPreview = props.route.params.optionPreview
     const pathImage = props.route.params.optionCard
-    const players = props.route.params.players
-    const clonePlayers = useRef([...players]).current
 
     const [board, setBoard] = useState([[]]);
     const [finishGame, setFinishGame] = useState(false);
@@ -73,10 +71,11 @@ export default props => {
     dataBase.setHours(0, 0, 0, 0);
     const dataGame = useRef(dataBase).current;
 
+    const players = props.route.params.players || []
+    const clonePlayers = useRef([...players]).current
     const playerCurrent = useRef({ position: 0 }).current
     const countAttempts = useRef({ value: 0 }).current;
     const pointsGame = useRef({ value: 0 }).current;
-
     const [rankings, setRankings] = useState([[]]);
 
     const selecteds = [];
@@ -97,8 +96,10 @@ export default props => {
             } catch (e) { console.log("ERRO loadRankings GAME >>> " + e) }
 
         }
-        loadRankings();
 
+        if (isModeCompete) {
+            loadRankings();
+        }
         newGame(showPreview, true)
         dataGame.setHours(0, 0, 0, 0)
     }, [])
@@ -115,47 +116,45 @@ export default props => {
         let hasNextGame = false
         if (!firstPlayer) {
             msg = `Partida encerrada!             
-            \nPontos: ${ pointsGame.value} `
+            \nPontos: ${ pointsGame.value} \n\n`
         }
 
-        if (players instanceof Array && players[playerCurrent.position] != null) {
-            msg += `\nIniciando partida do jogador ${players[playerCurrent.position].name} `
-            hasNextGame = true
+        if (isModeCompete) {
+            if (players instanceof Array && players[playerCurrent.position] != null) {
+                msg += `\nIniciando partida do jogador ${players[playerCurrent.position].name} `
+                hasNextGame = true
+            } else {
+                let winPlayer = calculeRanking();
+                saveRanking(winPlayer)
+                msg += `\npartida finalizada`
+                props.navigation.dispatch(StackActions.pop(2));
+            }
+
+            Alert.alert("Atenção", msg,
+                [{
+                    text: "Ok", onPress: () => {
+
+                        if (!hasNextGame) return
+                        const newBoard = createCardBoard(rows, columns, pathImage, showOpenedCards)
+                        selecteds.splice(0, selecteds.length)
+                        countAttempts.value = 0
+                        pointsGame.value = 0
+                        dataGame.setHours(0, 0, 0, 0)
+                        setBoard(newBoard)
+                    }
+                }],
+                { cancelable: false }
+            )
         } else {
-            let winPlayer = calculeRanking();
-            saveRanking(winPlayer)
-            msg += `\npartida finalizada`
-            props.navigation.goBack(null)
-            props.route.params.onLoadingRankings();
+            const newBoard = createCardBoard(rows, columns, pathImage, showOpenedCards)
+            selecteds.splice(0, selecteds.length)
+            countAttempts.value = 0
+            pointsGame.value = 0
+            dataGame.setHours(0, 0, 0, 0)
+            setBoard(newBoard)
         }
 
-        /* if (!hasNextGame) return
-        const newBoard = createCardBoard(rows, columns, pathImage, showOpenedCards)
-        selecteds.splice(0, selecteds.length)
-        countAttempts.value = 0
-        pointsGame.value = 0
-        dataGame.setHours(0, 0, 0, 0)
-        //setFinishGame(false)   
-        setBoard(newBoard) */
 
-
-        Alert.alert("Atenção", msg,
-            [{
-                text: "Ok", onPress: () => {
-
-                    if (!hasNextGame) return
-                    const newBoard = createCardBoard(rows, columns, pathImage, showOpenedCards)
-                    selecteds.splice(0, selecteds.length)
-                    countAttempts.value = 0
-                    pointsGame.value = 0
-                    dataGame.setHours(0, 0, 0, 0)
-                    //setFinishGame(false)                    
-                    setBoard(newBoard)
-
-                }
-            }],
-            { cancelable: false }
-        )
 
     }
 
@@ -197,14 +196,7 @@ export default props => {
         await AsyncStorage.setItem(RANKINGS_STORAGA_NAME, JSON.stringify(newRankings))
     }
 
-    async function testeFinish() {
-        await saveRanking(players[1])
-        props.route.params.onLoadingRankings();
-        props.navigation.goBack(null)
-    }
-
     function refreshPoints() {
-
         switch (countAttempts.value) {
             case 1:
                 pointsGame.value += 10
@@ -216,7 +208,7 @@ export default props => {
                 pointsGame.value += 6
                 break;
             case 4:
-                pointsGame.total += 4
+                pointsGame.value += 4
                 break;
             default:
                 pointsGame.value += 2
@@ -231,6 +223,7 @@ export default props => {
         selecteds.push(selectedItem)
 
         if (selecteds.length === 2) {
+
             countAttempts.value += 1;
 
             const idDoubleItem = selecteds[0].idDoubleItem;
@@ -269,21 +262,17 @@ export default props => {
 
     return (
         <>
-            <View style={styles.container}>
-                {!gameInitialized
-                    ? <TouchableOpacity style={styles.containerNewGame} onPress={startGame}>
-                        <Text style={styles.textNewGame}>Iniciar</Text>
-                    </TouchableOpacity>
-                    : <Relogio time={dataGame} pointsGame={pointsGame.value} finishGame={finishGame} />}
-                <View style={styles.board}>
-                    <Board board={board} onOpenSelect={onOpenSelect} />
-                </View>
-                {/*<TouchableOpacity onPress={testeFinish}>
-                    <Text>Teste</Text>
-                </TouchableOpacity> */ }
+        <View style={styles.container}>
+            {!gameInitialized
+                ? <TouchableOpacity style={styles.containerNewGame} onPress={startGame}>
+                    <Text style={styles.textNewGame}>Iniciar</Text>
+                </TouchableOpacity>
+                : <Relogio time={dataGame} pointsGame={pointsGame.value} finishGame={finishGame} />}
+            <View style={styles.board}>
+                <Board board={board} onOpenSelect={onOpenSelect} />
             </View>
-
-            {isProduction ? <BannerAdMobBanner /> : false}
+        </View>
+        <BannerAdMobBanner />
         </>
     );
 }
