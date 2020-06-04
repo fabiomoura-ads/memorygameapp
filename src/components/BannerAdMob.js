@@ -2,7 +2,7 @@ import React from 'react'
 import { View } from 'react-native'
 import { AdMobBanner } from 'expo-ads-admob';
 
-const isProduction = true;
+const isProduction = false;
 
 const BannerAdMobBanner = props => {
     //--id valido

@@ -10,9 +10,9 @@ export default props => {
     useEffect(() => {
         async function load() {
             //--teste            
-            //await AdMobInterstitial.setAdUnitID('ca-app-pub-3940256099942544/1033173712')
+            await AdMobInterstitial.setAdUnitID('ca-app-pub-3940256099942544/1033173712')
             //---prod
-            await AdMobInterstitial.setAdUnitID('ca-app-pub-3966719253606702/1496212326')
+            //await AdMobInterstitial.setAdUnitID('ca-app-pub-3966719253606702/1496212326')
         }
         load();
     })
