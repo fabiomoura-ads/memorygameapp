@@ -6,6 +6,7 @@ const isProduction = false;
 
 const BannerAdMobBanner = props => {
     //--id valido
+    //-- "ca-app-pub-3940256099942544/6300978111"
     return (
         <View>
             <AdMobBanner

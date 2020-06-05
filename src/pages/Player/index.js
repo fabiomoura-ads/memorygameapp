@@ -173,7 +173,9 @@ export default props => {
                             <Option opt={[6, 6]} value={[6, 6]} selected={optionLevel} onSelect={selectOptionLevel} />
                         </View>
 
-                        { players.length ? <Text style={styles.textTitle}>Vitórias</Text> : false }
+                        { players.length 
+                            ? <Text style={styles.textTitle}>Jogadores</Text> 
+                            : <Text style={[styles.textTitle, styles.textTitleBig]}>Nenhum jogador cadastrado</Text>  }
                         
                         <FlatList
                             style={styles.flatList}
@@ -228,7 +230,7 @@ export default props => {
                         </TouchableOpacity>
                     </View>
 
-                   <BannerAdMobBanner />
+                    { /* <BannerAdMobBanner /> */ }
                 </View>
             </KeyboardAvoidingView>
         </>
@@ -255,10 +257,10 @@ const styles = StyleSheet.create({
         justifyContent: "space-around",
     },
     footer: {
-        flex: 2,
+        flex: 1,
         alignItems: "center",
         justifyContent: "center",
-        marginBottom: 5
+        marginBottom: 35
     },
     title: {
         fontSize: 35,
@@ -285,11 +287,15 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
     },
     textTitle: {
-        fontSize: 16,
+        fontSize: 20,
         fontWeight: "bold",
         color: "#E8643C",
-        marginBottom: 2,
+        marginBottom: 5,
         marginTop: 10
+    },
+    textTitleBig:{
+        fontSize: 23,
+        marginTop: 40
     },
     containerOptions: {
         flexDirection: "row",
@@ -371,7 +377,7 @@ const styles = StyleSheet.create({
         borderColor: "#eee",
     },
     input: {
-        height: 35,
+        height: 40,
         marginLeft: 30,
         backgroundColor: "#eee",
         borderRadius: 4,

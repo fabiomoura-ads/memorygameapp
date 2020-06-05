@@ -19,6 +19,7 @@ export default props => {
         stylesOptionText.push(styles.textOptSelected)
         stylesOptionImage.push(styles.optCardSelected)
     }
+    if ( props.small ) stylesOptionImage.push(styles.optCardSmall)
 
     return (
         <TouchableOpacity onPress={() => props.onSelect(props.value)}>
@@ -64,14 +65,19 @@ const styles = StyleSheet.create({
         color: "#fff"
     },
     optCard: {
-        width: 90,
-        height: 85,
+        width: 110,
+        height: 110,
         borderRadius: 30,
         overflow: "hidden",
-        borderWidth: 3,
+        borderWidth: 4,
         borderColor: "#eee",
         textAlign: "center",
         justifyContent: "flex-end"
+    },
+    optCardSmall: {
+        width: 100,
+        height: 90,
+        borderWidth: 3,
     },
     optCardSelected: {
         borderColor: "red",

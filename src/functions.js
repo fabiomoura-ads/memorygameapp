@@ -18,21 +18,34 @@ const spreadCards = (board, pathImage) => {
     const totalCards = rows * columns;
 
     let cardsIncludes = 0;
-    let idDoubleItem = 1;
     let count = 0;
+    const idSorteds = [];
+
+    //-- add first image
+    let numImage = parseInt(Math.random() * 19, 10)
+    while (numImage == 0) {
+        numImage = parseInt(Math.random() * 19, 10)
+    }
+    idSorteds.push(numImage)
 
     while (cardsIncludes < totalCards) {
         const rowSel = parseInt(Math.random() * rows, 10);
         const columnSel = parseInt(Math.random() * columns, 10);
 
         if (count > 1) {
-            idDoubleItem++;
+
+            numImage = parseInt(Math.random() * 19, 10)
+            while (idSorteds.includes(numImage) || numImage == 0) {
+                numImage = parseInt(Math.random() * 19, 10)
+            }
+            idSorteds.push(numImage)
+
             count = 0;
         }
-
+        
         if (!board[rowSel][columnSel].image) {
-            board[rowSel][columnSel].image = `${pathImage}/${idDoubleItem}.png`
-            board[rowSel][columnSel].idDoubleItem = idDoubleItem
+            board[rowSel][columnSel].image = `${pathImage}/${numImage}.png`
+            board[rowSel][columnSel].idDoubleItem = numImage
             count++;
             cardsIncludes++;
         }

@@ -14,7 +14,7 @@ export default props => {
             //---prod
             //await AdMobInterstitial.setAdUnitID('ca-app-pub-3966719253606702/1496212326')
         }
-        load();
+        //load();
     })
 
     async function ShowAdMobInterstitial() {
@@ -25,7 +25,7 @@ export default props => {
     async function checkShowAdMob(){
         countPlays.current++;
         if (countPlays.current == 5 ) {
-            await ShowAdMobInterstitial();
+            //await ShowAdMobInterstitial();
             countPlays.current = 0;
         }
     }
@@ -65,7 +65,7 @@ export default props => {
                 </View>
             </View>
 
-            <BannerAdMobBanner />
+            { /* <BannerAdMobBanner /> */ }
 
         </View>
 

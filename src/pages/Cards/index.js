@@ -3,7 +3,6 @@ import { View, Text, StyleSheet, TouchableOpacity, AsyncStorage, KeyboardAvoidin
 import { BannerAdMobBanner } from '../../components/BannerAdMob'
 import { AdMobInterstitial } from 'expo-ads-admob'
 import Option from '../../components/Option'
-import params from '../../params';
 import OptAnimals from '../../images/opt_animals.jpg'
 import OptCars from '../../images/opt_cars.jpg'
 import OptSocials from '../../images/opt_socials.jpg'
@@ -26,7 +25,7 @@ export default props => {
             //---prod
             //await AdMobInterstitial.setAdUnitID('ca-app-pub-3966719253606702/1496212326')
         }
-        load();
+        //load();
     })
 
     function selectOptionCard(opt) {
@@ -44,7 +43,7 @@ export default props => {
     async function toGame() {
         countPlays.current++;
         if (countPlays.current == 10 ) {
-            await ShowAdMobInterstitial();
+            //await ShowAdMobInterstitial();
             countPlays.current = 0;
         }
         props.navigation.navigate('Game', { optionLevel, optionCard, optionPreview, players, modeCompete: true})
@@ -89,7 +88,7 @@ export default props => {
                         </TouchableOpacity>
                     </View>
 
-                    <BannerAdMobBanner />
+                    { /* <BannerAdMobBanner /> */ }
                 </View>
             </KeyboardAvoidingView>
         </>
@@ -110,7 +109,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 30,
     },
     body: {
-        flex: 2,
+        flex: 3,
         width: "100%",
         alignItems: "center",
         justifyContent: "space-around",
@@ -146,11 +145,11 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
     },
     textTitle: {
-        fontSize: 16,
+        fontSize: 20,
         fontWeight: "bold",
         color: "#E8643C",
-        marginBottom: 1,
-        marginTop: 8
+        marginBottom: 5,
+        marginTop: 10
     },
     containerOptions: {
         flexDirection: "row",

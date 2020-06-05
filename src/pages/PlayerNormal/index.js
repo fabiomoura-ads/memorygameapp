@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
 import { BannerAdMobBanner } from '../../components/BannerAdMob'
-import { AdMobInterstitial } from 'expo-ads-admob'
 import Option from '../../components/Option'
 import OptAnimals from '../../images/opt_animals.jpg'
 import OptCars from '../../images/opt_cars.jpg'
@@ -47,15 +46,15 @@ export default props => {
                 <Text style={styles.textTitle}>Tipo de cartas</Text>
                 <View style={[styles.containerOptions, styles.containerOptionsImg]}>
 
-                    <Option opt={'Animais'} value={"animals"} selected={optionCard} onSelect={selectOptionCard} isImg={true} source={OptAnimals} />
-                    <Option opt={'Carros'} value={"cars"} selected={optionCard} onSelect={selectOptionCard} isImg={true} source={OptCars} />
+                    <Option opt={'Animais'} value={"animals"} selected={optionCard} onSelect={selectOptionCard} small isImg={true} source={OptAnimals} />
+                    <Option opt={'Carros'} value={"cars"} selected={optionCard} onSelect={selectOptionCard} small isImg={true} source={OptCars} />
 
                 </View>
 
                 <View style={[styles.containerOptions, styles.containerOptionsImg]}>
 
-                    <Option opt={'Símbolos'} value={"simbols"} selected={optionCard} onSelect={selectOptionCard} isImg={true} source={OptSocials} />
-                    <Option opt={'Emojis'} value={"emojis"} selected={optionCard} onSelect={selectOptionCard} isImg={true} source={OptEmojis} />
+                    <Option opt={'Símbolos'} value={"simbols"} selected={optionCard} onSelect={selectOptionCard} small isImg={true} source={OptSocials} />
+                    <Option opt={'Emojis'} value={"emojis"} selected={optionCard} onSelect={selectOptionCard} small isImg={true} source={OptEmojis} />
 
                 </View>
 
@@ -73,7 +72,7 @@ export default props => {
                 </TouchableOpacity>
             </View>
 
-            <BannerAdMobBanner />
+            { /* <BannerAdMobBanner /> */ }
 
         </View>
 
@@ -94,7 +93,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 30,
     },
     body: {
-        flex: 3,
+        flex: 4,
         alignItems: "center",
         justifyContent: "space-around",
     },
@@ -105,12 +104,11 @@ const styles = StyleSheet.create({
         marginBottom: 5
     },
     textTitle: {
-        fontSize: 16,
+        fontSize: 20,
         fontWeight: "bold",
         color: "#E8643C",
-        marginBottom: 2,
+        marginBottom: 5,
         marginTop: 10
-
     },
     textButton: {
         color: "#fff",
@@ -160,9 +158,4 @@ const styles = StyleSheet.create({
         backgroundColor: "red",
         color: "#fff"
     },
-
-
-
-
-
 })

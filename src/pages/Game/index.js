@@ -53,7 +53,6 @@ const Relogio = props => {
 
 export default props => {
 
-    const PLAYERS_STORAGA_NAME = params.payerStorageName
     const RANKINGS_STORAGA_NAME = params.rankingsStorageName
     const isModeCompete = props.route.params.modeCompete || null
 
@@ -114,9 +113,10 @@ export default props => {
         // \nTempo: ${ dataGame.getMinutes() ? dataGame.getMinutes() + ' minutos e ' : ''} ${dataGame.getSeconds()} segundos
         let msg = ""
         let hasNextGame = false
+        let title = 'Início do Jogo!';
         if (!firstPlayer) {
-            msg = `Partida encerrada!             
-            \nPontos: ${ pointsGame.value} \n\n`
+            msg = `\Você Ganhou: ${ pointsGame.value} pontos.\n\n`
+            title = 'Parabéns!'
         }
 
         if (isModeCompete) {
@@ -124,13 +124,15 @@ export default props => {
                 msg += `\nIniciando partida do jogador ${players[playerCurrent.position].name} `
                 hasNextGame = true
             } else {
+                title = 'Fim do Jogo!'
                 let winPlayer = calculeRanking();
                 saveRanking(winPlayer)
-                msg += `\npartida finalizada`
+                msg += `\nJogo Finalizado!
+                \nJogador ${winPlayer.name} foi o vencedor!!!`
                 props.navigation.dispatch(StackActions.pop(2));
             }
 
-            Alert.alert("Atenção", msg,
+            Alert.alert(title, msg,
                 [{
                     text: "Ok", onPress: () => {
 
@@ -146,15 +148,15 @@ export default props => {
                 { cancelable: false }
             )
         } else {
-            const newBoard = createCardBoard(rows, columns, pathImage, showOpenedCards)
-            selecteds.splice(0, selecteds.length)
-            countAttempts.value = 0
-            pointsGame.value = 0
-            dataGame.setHours(0, 0, 0, 0)
-            setBoard(newBoard)
+            if (firstPlayer) {
+                const newBoard = createCardBoard(rows, columns, pathImage, showOpenedCards)
+                selecteds.splice(0, selecteds.length)
+                countAttempts.value = 0
+                pointsGame.value = 0
+                dataGame.setHours(0, 0, 0, 0)
+                setBoard(newBoard)
+            }
         }
-
-
 
     }
 
@@ -173,8 +175,8 @@ export default props => {
             if (level.id != optionLevel) {
                 return { ...level }
             }
+            winPlayer.victories = 1            
             if (!level.players.length) {
-                winPlayer.victories = 1
                 return { ...level, players: [winPlayer] }
             }
 
@@ -192,7 +194,6 @@ export default props => {
 
             return { ...level, players: newPlayers }
         })
-
         await AsyncStorage.setItem(RANKINGS_STORAGA_NAME, JSON.stringify(newRankings))
     }
 
@@ -256,6 +257,7 @@ export default props => {
                 playerCurrent.position++;
                 setFinishGame(true)
                 newGame(showPreview);
+
             }
         }
     }
@@ -272,7 +274,7 @@ export default props => {
                 <Board board={board} onOpenSelect={onOpenSelect} />
             </View>
         </View>
-        <BannerAdMobBanner />
+        { /* <BannerAdMobBanner /> */ }
         </>
     );
 }
