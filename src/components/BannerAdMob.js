@@ -9,7 +9,6 @@ const BannerAdMobBanner = props => {
                 bannerSize="fullBanner"
                 adUnitID="ca-app-pub-3966719253606702/6829743132"
                 servePersonalizedAds
-                setTestDeviceIDAsync={!isProduction}
                 onDidFailToReceiveAdWithError={erro => console.log(erro)} />
         </View>
     )
