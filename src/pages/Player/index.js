@@ -230,7 +230,7 @@ export default props => {
                         </TouchableOpacity>
                     </View>
 
-                    { /* <BannerAdMobBanner /> */ }
+                    <BannerAdMobBanner />
                 </View>
             </KeyboardAvoidingView>
         </>

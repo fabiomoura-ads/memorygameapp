@@ -12,7 +12,6 @@ export default props => {
     const [optionLevel, setOptionLevel] = useState([4, 3]);
     const [optionCard, setOptionCard] = useState('animals');
     const [optionPreview, setOptionPreview] = useState(false);
-    const countPlays = useRef(0);
 
     function selectOptionLevel(opt) {
         setOptionLevel(opt)
@@ -72,7 +71,7 @@ export default props => {
                 </TouchableOpacity>
             </View>
 
-            { /* <BannerAdMobBanner /> */ }
+            <BannerAdMobBanner />
 
         </View>
 

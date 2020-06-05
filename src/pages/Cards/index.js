@@ -20,12 +20,9 @@ export default props => {
 
     useEffect(() => {
         async function load() {
-            //--teste            
-            await AdMobInterstitial.setAdUnitID('ca-app-pub-3940256099942544/1033173712')
-            //---prod
-            //await AdMobInterstitial.setAdUnitID('ca-app-pub-3966719253606702/1496212326')
+            await AdMobInterstitial.setAdUnitID('ca-app-pub-3966719253606702/1496212326')
         }
-        //load();
+        load();
     })
 
     function selectOptionCard(opt) {
@@ -43,7 +40,7 @@ export default props => {
     async function toGame() {
         countPlays.current++;
         if (countPlays.current == 10 ) {
-            //await ShowAdMobInterstitial();
+            await ShowAdMobInterstitial();
             countPlays.current = 0;
         }
         props.navigation.navigate('Game', { optionLevel, optionCard, optionPreview, players, modeCompete: true})
@@ -88,7 +85,7 @@ export default props => {
                         </TouchableOpacity>
                     </View>
 
-                    { /* <BannerAdMobBanner /> */ }
+                    <BannerAdMobBanner />
                 </View>
             </KeyboardAvoidingView>
         </>

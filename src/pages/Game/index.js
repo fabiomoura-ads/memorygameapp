@@ -175,8 +175,9 @@ export default props => {
             if (level.id != optionLevel) {
                 return { ...level }
             }
-            winPlayer.victories = 1            
+                     
             if (!level.players.length) {
+                winPlayer.victories = 1
                 return { ...level, players: [winPlayer] }
             }
 
@@ -274,7 +275,7 @@ export default props => {
                 <Board board={board} onOpenSelect={onOpenSelect} />
             </View>
         </View>
-        { /* <BannerAdMobBanner /> */ }
+        <BannerAdMobBanner />
         </>
     );
 }
