@@ -20,6 +20,7 @@ export default props => {
     const [optionLevel, setOptionLevel] = useState([4, 3]);
        
     useEffect(() => {
+        loadRankings();
         loadPlayers();
     }, [])
 
@@ -31,17 +32,10 @@ export default props => {
     }, [players])
 
     useEffect(() => {
-        async function saveRankingsStorage() {
-            AsyncStorage.setItem(RANKINGS_STORAGA_NAME, JSON.stringify(rankings))
-        }
-
-        saveRankingsStorage();
-    }, [rankings])
-
-    useEffect(() => {
         const unsubscribe = props.navigation.addListener('focus', () => {
             loadRankings();
         });
+        
         return unsubscribe;
     }, [props.navigation]);
 
@@ -49,6 +43,8 @@ export default props => {
         const rankingsStorage = await AsyncStorage.getItem(RANKINGS_STORAGA_NAME);
         if (rankingsStorage) {
             setRankings(JSON.parse(rankingsStorage));
+        }else {            
+            AsyncStorage.setItem(RANKINGS_STORAGA_NAME, JSON.stringify(rankings))  
         }
     }
 
