@@ -115,7 +115,7 @@ export default props => {
         let hasNextGame = false
         let title = 'Início do Jogo!';
         if (!firstPlayer) {
-            msg = `\Você Ganhou: ${ pointsGame.value} pontos.\n\n`
+            msg = `\Você Ganhou: ${pointsGame.value} pontos.\n\n`
             title = 'Parabéns!'
         }
 
@@ -143,6 +143,9 @@ export default props => {
                         pointsGame.value = 0
                         dataGame.setHours(0, 0, 0, 0)
                         setBoard(newBoard)
+                        if (showOpenedCards) {
+                            setGameInitialized(false);
+                        }
                     }
                 }],
                 { cancelable: false }
@@ -175,7 +178,7 @@ export default props => {
             if (level.id != optionLevel) {
                 return { ...level }
             }
-                     
+
             if (!level.players.length) {
                 winPlayer.victories = 1
                 return { ...level, players: [winPlayer] }
@@ -265,17 +268,17 @@ export default props => {
 
     return (
         <>
-        <View style={styles.container}>
-            {!gameInitialized
-                ? <TouchableOpacity style={styles.containerNewGame} onPress={startGame}>
-                    <Text style={styles.textNewGame}>Iniciar</Text>
-                </TouchableOpacity>
-                : <Relogio time={dataGame} pointsGame={pointsGame.value} finishGame={finishGame} />}
-            <View style={styles.board}>
-                <Board board={board} onOpenSelect={onOpenSelect} />
+            <View style={styles.container}>
+                {!gameInitialized
+                    ? <TouchableOpacity style={styles.containerNewGame} onPress={startGame}>
+                        <Text style={styles.textNewGame}>Iniciar</Text>
+                    </TouchableOpacity>
+                    : <Relogio time={dataGame} pointsGame={pointsGame.value} finishGame={finishGame} />}
+                <View style={styles.board}>
+                    <Board board={board} onOpenSelect={onOpenSelect} />
+                </View>
             </View>
-        </View>
-        <BannerAdMobBanner />
+            <BannerAdMobBanner />
         </>
     );
 }
