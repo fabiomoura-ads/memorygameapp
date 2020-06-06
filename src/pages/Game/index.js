@@ -109,18 +109,6 @@ export default props => {
         setGameInitialized(true);
     }
 
-    function isFeminine(name){
-        if ( !name ) {
-            return false
-        } 
-        const n = name.toString().trim().toLowerCase()
-        const lastChar = n.charAt(n.length - 1 )
-        if ( lastChar == 'a' ) {
-            return true
-        }
-        return false;
-    }
-
     function newGame(showOpenedCards, firstPlayer) {
         // \nTempo: ${ dataGame.getMinutes() ? dataGame.getMinutes() + ' minutos e ' : ''} ${dataGame.getSeconds()} segundos
         let msg = ""
