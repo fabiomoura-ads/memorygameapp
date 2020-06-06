@@ -11,6 +11,8 @@ const Relogio = props => {
 
     function retornaDataFormatada() {
         let data = new Date(time);
+
+
         return data.getHours().toString().padStart(2, '0') + ":" + data.getMinutes().toString().padStart(2, '0') + ":" + data.getSeconds().toString().padStart(2, '0')
     }
 
@@ -32,11 +34,13 @@ const Relogio = props => {
         if (props.finishGame) {
             clearInterval(idIntervalRef.current)
         }
+
+
     }, [time])
 
     return (
         <View style={styles.headerTime}>
-            <Text style={styles.textHeaderTime}>Pontos: {props.pointsGame} </Text>
+            <Text style={styles.textHeaderTime}>Pontossss: {props.pointsGame} </Text>
             <Text style={styles.textHeaderTime}>Tempo: {retornaDataFormatada()}</Text>
         </View>
     )

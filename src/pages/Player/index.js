@@ -35,6 +35,7 @@ export default props => {
         const unsubscribe = props.navigation.addListener('focus', () => {
             loadRankings();
         });
+        
         return unsubscribe;
     }, [props.navigation]);
 
@@ -73,7 +74,7 @@ export default props => {
             return;
         }
 
-        if (players.length === 5) {
+        if (players.length == 5) {
             Alert.alert('Atenção!', 'Limite máximo de 5 jogadores!')
             return;
         }
@@ -173,7 +174,7 @@ export default props => {
 
                         { players.length 
                             ? <Text style={styles.textTitle}>Jogadores</Text> 
-                            : <Text style={[styles.textTitle, styles.textTitleBig]}>Nenhum jogador cadastrado</Text>  }
+                            : <Text style={[styles.textTitle, styles.textTitleBig]}>Nenhum jogador cadastrado!</Text>  }
                         
                         <FlatList
                             style={styles.flatList}
@@ -214,7 +215,7 @@ export default props => {
                                 style={styles.input}
                                 placeholderTextColor="#999"
                                 autoCorrect={true}
-                                placeholder="Adicione um novo jogador"
+                                placeholder="Nome do novo jogador"
                                 maxLength={25}
                                 value={newPlayer.name}
                                 onChangeText={(name) => setNewPlayer({ name })} />

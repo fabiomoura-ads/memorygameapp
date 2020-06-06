@@ -110,7 +110,6 @@ export default props => {
     }
 
     function newGame(showOpenedCards, firstPlayer) {
-        // \nTempo: ${ dataGame.getMinutes() ? dataGame.getMinutes() + ' minutos e ' : ''} ${dataGame.getSeconds()} segundos
         let msg = ""
         let hasNextGame = false
         let title = 'Início do Jogo!';
@@ -121,13 +120,21 @@ export default props => {
 
         if (isModeCompete) {
             if (players instanceof Array && players[playerCurrent.position] != null) {
-                msg += `\nIniciando partida do jogador: ${players[playerCurrent.position].name} `                
+                msg += `\nIniciando partida do jogador: ${players[playerCurrent.position].name} `
                 hasNextGame = true
             } else {
                 title = 'Fim do Jogo!'
-                let winPlayer = calculeRanking();
-                saveRanking(winPlayer)
-                msg += `\nJogo Finalizado!\nJogador ${winPlayer.name} foi o vencedor!!! `
+                const winners = calculeteRanking();
+                saveRanking(winners)
+
+                msg += `\nJogo finalizado!`
+                if (winners.length > 1) {
+                    let winnersNames = winners.map(w => w.name);
+                    msg += ` Houve empate!`
+                    msg += `\nJogadores ${winnersNames.join(' - ')} são os vencedores!!!`
+                } else {
+                    msg += `\nJogador ${winners[0].name} foi o vencedor!!!`
+                }
                 props.navigation.dispatch(StackActions.pop(2));
             }
 
@@ -141,10 +148,11 @@ export default props => {
                         countAttempts.value = 0
                         pointsGame.value = 0
                         dataGame.setHours(0, 0, 0, 0)
-                        setBoard(newBoard)
-                        if (showOpenedCards) {
+                        if (showPreview) {
                             setGameInitialized(false);
                         }
+
+                        setBoard(newBoard)
                     }
                 }],
                 { cancelable: false }
@@ -162,37 +170,71 @@ export default props => {
 
     }
 
-    function calculeRanking() {
+    //--TODO REVISAR PARA CASO DE EMPATE
+    function calculeteRanking() {
+
+        const maxPoint = clonePlayers.reduce((prev, current) => (prev.points > current.points) ? prev : current).points;
+
+        const winners = clonePlayers.filter(p => p.points == maxPoint);
+
+        return winners
+
+        /*
         let winPlayer = { ...clonePlayers[0], victories: 0 }
         for (var i = 0; i < clonePlayers.length; i++) {
             if (clonePlayers[i].points > winPlayer.points) {
                 winPlayer = clonePlayers[i]
             }
         }
-        return winPlayer
+        return winPlayer */
     }
 
-    async function saveRanking(winPlayer) {
+    async function saveRanking(winners) {
+
         const newRankings = rankings.map(level => {
+
             if (level.id != optionLevel) {
                 return { ...level }
             }
 
+            //-- se vazio adiciona todos os vencedores
             if (!level.players.length) {
-                winPlayer.victories = 1
-                return { ...level, players: [winPlayer] }
+
+                let winnersLevel = winners.map(winner => {
+                    return { ...winner, victories: 1 }
+                })
+
+                return { ...level, players: winnersLevel }
             }
 
-            if (level.players.filter(player => player.id == winPlayer.id).length === 0) {
+            //-- se não for vazio, atualiza vitorias dos jogadores
+            winners.forEach(winner => {
+
+                if (level.players.filter(player => player.id == winner.id).length === 0) {
+                    level.players.push({ ...winner, victories: 0 })
+                }
+
+            })
+
+            /*if (level.players.filter(player => player.id == winPlayer.id).length === 0) {
                 level.players.push(winPlayer)
-            }
+            }*/
 
             let newPlayers = level.players.map(player => {
-                if (player.id == winPlayer.id) {
+
+                //--se o jogador já existir nos players incrementa vitórias, senão só copia o jogador
+                if (winners.filter(winner => winner.id == player.id).length === 1) {
                     return { ...player, victories: player.victories + 1 }
                 } else {
                     return { ...player }
                 }
+
+                /*
+                if (player.id == winPlayer.id) {
+                    return { ...player, victories: player.victories + 1 }
+                } else {
+                    return { ...player }
+                }*/
             })
 
             return { ...level, players: newPlayers }
@@ -254,7 +296,6 @@ export default props => {
                 clonePlayers.forEach(player => {
                     if (player.id === players[playerCurrent.position].id) {
                         player.points = pointsGame.value
-                        //player.time = (dataGame.getMinutes() * 60 + dataGame.getSeconds())
                     }
                 })
                 playerCurrent.position++;
