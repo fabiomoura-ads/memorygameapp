@@ -35,7 +35,6 @@ export default props => {
         const unsubscribe = props.navigation.addListener('focus', () => {
             loadRankings();
         });
-        
         return unsubscribe;
     }, [props.navigation]);
 
@@ -43,7 +42,7 @@ export default props => {
         const rankingsStorage = await AsyncStorage.getItem(RANKINGS_STORAGA_NAME);
         if (rankingsStorage) {
             setRankings(JSON.parse(rankingsStorage));
-        }else {            
+        }else {
             AsyncStorage.setItem(RANKINGS_STORAGA_NAME, JSON.stringify(rankings))  
         }
     }
@@ -69,10 +68,13 @@ export default props => {
     }
 
     function addPlayer() {
-        if (!newPlayer.name) return;
+        if (!newPlayer.name) {
+            Alert.alert('Atenção!', 'Preencha o campo ao lado para cadastrar um novo jogador')
+            return;
+        }
 
-        if (players.length === 3) {
-            Alert.alert(`Atenção!`, `Limite máximo de 3 jogadores!`)
+        if (players.length === 5) {
+            Alert.alert('Atenção!', 'Limite máximo de 5 jogadores!')
             return;
         }
 
@@ -194,7 +196,7 @@ export default props => {
                                             onPress={() => selectPlayer(item)}>
                                             <AntDesign
                                                 name={item.checked ? "checkcircle" : "checkcircleo"} size={25}
-                                                color={item.checked ? "green" : "#ccc"} />
+                                                color={item.checked ? "green" : "#fff"} />
                                         </TouchableOpacity>
                                         <TouchableOpacity
                                             onPress={() => removePlayer(item)}>

@@ -109,6 +109,18 @@ export default props => {
         setGameInitialized(true);
     }
 
+    function isFeminine(name){
+        if ( !name ) {
+            return false
+        } 
+        const n = name.toString().trim().toLowerCase()
+        const lastChar = n.charAt(n.length - 1 )
+        if ( lastChar == 'a' ) {
+            return true
+        }
+        return false;
+    }
+
     function newGame(showOpenedCards, firstPlayer) {
         // \nTempo: ${ dataGame.getMinutes() ? dataGame.getMinutes() + ' minutos e ' : ''} ${dataGame.getSeconds()} segundos
         let msg = ""
@@ -121,14 +133,13 @@ export default props => {
 
         if (isModeCompete) {
             if (players instanceof Array && players[playerCurrent.position] != null) {
-                msg += `\nIniciando partida do jogador ${players[playerCurrent.position].name} `
+                msg += `\nIniciando partida do jogador: ${players[playerCurrent.position].name} `                
                 hasNextGame = true
             } else {
                 title = 'Fim do Jogo!'
                 let winPlayer = calculeRanking();
                 saveRanking(winPlayer)
-                msg += `\nJogo Finalizado!
-                \nJogador ${winPlayer.name} foi o vencedor!!!`
+                msg += `\nJogo Finalizado!\nJogador ${winPlayer.name} foi o vencedor!!! `
                 props.navigation.dispatch(StackActions.pop(2));
             }
 
