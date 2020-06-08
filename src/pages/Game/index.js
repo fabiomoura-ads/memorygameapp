@@ -77,7 +77,7 @@ export default props => {
     const pointsGame = useRef({ value: 0 }).current;
     const [rankings, setRankings] = useState([[]]);
 
-    const selecteds = [];
+    const pairSelected = [];
 
     useEffect(() => {
         async function loadRankings() {
@@ -144,7 +144,7 @@ export default props => {
 
                         if (!hasNextGame) return
                         const newBoard = createCardBoard(rows, columns, pathImage, showOpenedCards)
-                        selecteds.splice(0, selecteds.length)
+                        pairSelected.splice(0, pairSelected.length)
                         countAttempts.value = 0
                         pointsGame.value = 0
                         dataGame.setHours(0, 0, 0, 0)
@@ -160,7 +160,7 @@ export default props => {
         } else {
             if (firstPlayer) {
                 const newBoard = createCardBoard(rows, columns, pathImage, showOpenedCards)
-                selecteds.splice(0, selecteds.length)
+                pairSelected.splice(0, pairSelected.length)
                 countAttempts.value = 0
                 pointsGame.value = 0
                 dataGame.setHours(0, 0, 0, 0)
@@ -266,14 +266,16 @@ export default props => {
     function onOpenSelect(row, column) {
 
         const selectedItem = board[row][column]
-        selecteds.push(selectedItem)
+        pairSelected.push(selectedItem)
 
-        if (selecteds.length === 2) {
+        if (pairSelected.length === 2) {
 
             countAttempts.value += 1;
 
-            const idDoubleItem = selecteds[0].idDoubleItem;
-            const equals = selecteds.filter(item => item.idDoubleItem === idDoubleItem).length === 2
+            //const idDoubleItem = pairSelected[0].idDoubleItem;
+            //const equals = pairSelected.filter(item => item.idDoubleItem === idDoubleItem).length === 2
+
+            const equals = pairSelected.reduce((prev, current) => ( prev.idItemPair == current.idItemPair && prev.idItem != current.idItem ) )
 
             if (equals) {
                 refreshPoints()
@@ -281,7 +283,7 @@ export default props => {
 
             const newBoard = board.map(rows => {
                 return rows.map(item => {
-                    if (equals && item.idDoubleItem == idDoubleItem) {
+                    if (equals && item.idItemPair == idItemPair) {
                         return { ...item, opened: true }
                     } else {
                         return { ...item }
@@ -289,7 +291,7 @@ export default props => {
                 })
             })
 
-            selecteds.splice(0, selecteds.length);
+            pairSelected.splice(0, pairSelected.length);
             setBoard(newBoard);
 
             if (wonGame(newBoard)) {

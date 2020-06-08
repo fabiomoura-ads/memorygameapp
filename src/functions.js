@@ -6,7 +6,8 @@ const createBoard = (rows, columns, opened) => {
                 column,
                 opened: opened,
                 image: null,
-                idDoubleItem: null
+                idItemPair: null,
+                idItem: null
             }
         })
     })
@@ -19,14 +20,15 @@ const spreadCards = (board, pathImage) => {
 
     let cardsIncludes = 0;
     let count = 0;
-    const idSorteds = [];
+    const arNumImagesSorteds = [];
+    const arIdItemSorteds = [];
 
     //-- add first image
     let numImage = parseInt(Math.random() * 19, 10)
     while (numImage == 0) {
         numImage = parseInt(Math.random() * 19, 10)
     }
-    idSorteds.push(numImage)
+    arNumImagesSorteds.push(numImage)
 
     while (cardsIncludes < totalCards) {
         const rowSel = parseInt(Math.random() * rows, 10);
@@ -35,17 +37,25 @@ const spreadCards = (board, pathImage) => {
         if (count > 1) {
 
             numImage = parseInt(Math.random() * 19, 10)
-            while (idSorteds.includes(numImage) || numImage == 0) {
+            while (arNumImagesSorteds.includes(numImage) || numImage == 0) {
                 numImage = parseInt(Math.random() * 19, 10)
             }
-            idSorteds.push(numImage)
+            arNumImagesSorteds.push(numImage)
 
             count = 0;
         }
-        
+
         if (!board[rowSel][columnSel].image) {
             board[rowSel][columnSel].image = `${pathImage}/${numImage}.png`
-            board[rowSel][columnSel].idDoubleItem = numImage
+            board[rowSel][columnSel].idItemPair = numImage
+
+            let idItemSorted = parseInt(Math.random() * 1000, 10)
+            while (arIdItemSorteds.includes(idItemSorted) || idItemSorted == 0) {
+                idItemSorted = parseInt(Math.random() * 1000, 10)
+            }
+            arIdItemSorteds.push(idItemSorted)
+            board[rowSel][columnSel].idItem = idItemSorteds
+
             count++;
             cardsIncludes++;
         }
