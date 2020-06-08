@@ -114,7 +114,7 @@ export default props => {
         let hasNextGame = false
         let title = 'Início do Jogo!';
         if (!firstPlayer) {
-            msg = `\Você Ganhou: ${pointsGame.value} pontos.\n\n`
+            msg = `\nVocê Ganhou: ${pointsGame.value} pontos.\n\n`
             title = 'Parabéns!'
         }
 
@@ -165,6 +165,9 @@ export default props => {
                 pointsGame.value = 0
                 dataGame.setHours(0, 0, 0, 0)
                 setBoard(newBoard)
+            } else {
+                Alert.alert('Parabéns!', `\nVocê venceu a partida com: ${pointsGame.value} pontos.\n\nJogue novamente!`)
+                props.navigation.dispatch(StackActions.pop(1));
             }
         }
 

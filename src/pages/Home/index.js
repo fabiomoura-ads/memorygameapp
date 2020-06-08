@@ -5,7 +5,7 @@ import { AdMobInterstitial } from 'expo-ads-admob'
 
 export default props => {
 
-    const countPlays = useRef(0);
+    const countPlays = useRef(3);
 
     useEffect(() => {
         async function load() {
@@ -21,11 +21,12 @@ export default props => {
 
     async function checkShowAdMob(){
         countPlays.current++;
-        if (countPlays.current == 5 ) {
+        if (countPlays.current == 4 ) {
             await ShowAdMobInterstitial();
             countPlays.current = 0;
         }
     }
+    
     async function toPlayer() {
         await checkShowAdMob()
         props.navigation.navigate('Player')
