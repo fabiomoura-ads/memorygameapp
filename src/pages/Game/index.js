@@ -269,15 +269,15 @@ export default props => {
     function onOpenSelect(row, column) {
 
         const selectedItem = board[row][column]
-        pairSelected.push(selectedItem)
+
+        if ( pairSelected.filter(p => p.idItem == selectedItem.idItem ).length == 0 ) {
+            pairSelected.push(selectedItem)
+        }
 
         if (pairSelected.length === 2) {
 
             countAttempts.value += 1;
-
-            //const idDoubleItem = pairSelected[0].idDoubleItem;
-            //const equals = pairSelected.filter(item => item.idDoubleItem === idDoubleItem).length === 2
-
+    
             const equals = pairSelected.reduce((prev, current) => ( prev.idItemPair == current.idItemPair && prev.idItem != current.idItem ) )
 
             if (equals) {
@@ -286,7 +286,7 @@ export default props => {
 
             const newBoard = board.map(rows => {
                 return rows.map(item => {
-                    if (equals && item.idItemPair == idItemPair) {
+                    if (equals && item.idItemPair == pairSelected[0].idItemPair) {
                         return { ...item, opened: true }
                     } else {
                         return { ...item }

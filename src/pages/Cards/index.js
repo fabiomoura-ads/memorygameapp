@@ -39,7 +39,7 @@ export default props => {
 
     async function toGame() {
         countPlays.current++;
-        if (countPlays.current == 10 ) {
+        if (countPlays.current == 5 ) {
             await ShowAdMobInterstitial();
             countPlays.current = 0;
         }

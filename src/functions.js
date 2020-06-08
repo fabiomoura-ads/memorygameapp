@@ -54,7 +54,7 @@ const spreadCards = (board, pathImage) => {
                 idItemSorted = parseInt(Math.random() * 1000, 10)
             }
             arIdItemSorteds.push(idItemSorted)
-            board[rowSel][columnSel].idItem = idItemSorteds
+            board[rowSel][columnSel].idItem = idItemSorted
 
             count++;
             cardsIncludes++;
