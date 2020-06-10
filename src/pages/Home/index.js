@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useLayoutEffect } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
 import { BannerAdMobBanner } from '../../components/BannerAdMob'
 import { AdMobInterstitial } from 'expo-ads-admob'
@@ -10,7 +10,9 @@ export default props => {
 
     useEffect(() => {
         async function load() {
-            await AdMobInterstitial.setAdUnitID('ca-app-pub-3966719253606702/1496212326')
+            try{
+                await AdMobInterstitial.setAdUnitID('ca-app-pub-3966719253606702/1496212326')
+            }catch(e){console.log('Error load ' + e)}            
         }
         load();
     })
@@ -28,8 +30,11 @@ export default props => {
     }, [props.navigation]);
 
     async function ShowAdMobInterstitial() {
-        await AdMobInterstitial.requestAdAsync({ servePersonalizedAds: true })
-        await AdMobInterstitial.showAdAsync();
+        try{
+            await AdMobInterstitial.requestAdAsync({ servePersonalizedAds: true })
+            await AdMobInterstitial.showAdAsync();
+        }catch(e){console.log('Error ShowAdMobInterstitial ' + e)}
+
     }
 
     async function checkShowAdMob() {
