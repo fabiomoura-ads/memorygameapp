@@ -164,6 +164,9 @@ const styles = StyleSheet.create({
         backgroundColor: "red",
         color: "#fff"
     },
+    optionsMenu: {
+        marginRight: 10
+    }
 
 
 
