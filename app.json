@@ -6,7 +6,7 @@
       "ios",
       "android"
     ],
-    "version": "1.0.7",
+    "version": "1.0.8",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "splash": {
@@ -28,7 +28,7 @@
     },
     "android": {
       "package": "com.fmourabrasil.memorygameapp",
-      "versionCode": 7,
+      "versionCode": 8,
       "config": {
         "googleMobileAdsAppId": "ca-app-pub-3966719253606702~8061620671"
       }

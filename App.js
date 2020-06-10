@@ -7,6 +7,7 @@ import Game from './src/pages/Game'
 import Player from './src/pages/Player'
 import Cards from './src/pages/Cards'
 import PlayerNormal from './src/pages/PlayerNormal'
+import Help from './src/pages/Help'
 
 const MyTheme = {
   ...DefaultTheme,
@@ -43,6 +44,7 @@ export default function App() {
         <Stack.Screen name="Cards" component={Cards} options={{ title: 'Opções do Jogo' }} />
         <Stack.Screen name="Game" component={Game} options={{ title: 'Memorizze - Jogue!' }} />
         <Stack.Screen name="PlayerNormal" component={PlayerNormal} options={{ title: 'Opções do Jogo' }} />
+        <Stack.Screen name="Help" component={Help} options={{ title: 'Sobre o Jogo' }} />
 
       </Stack.Navigator>
 

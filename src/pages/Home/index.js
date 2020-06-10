@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
 import { BannerAdMobBanner } from '../../components/BannerAdMob'
 import { AdMobInterstitial } from 'expo-ads-admob'
+import { Feather } from '@expo/vector-icons';
 
 export default props => {
 
@@ -14,19 +15,31 @@ export default props => {
         load();
     })
 
+    useLayoutEffect(() => {
+        props.navigation.setOptions({
+            headerRight: () => (
+                <TouchableOpacity style={styles.optionsMenu} onPress={() => {
+                    props.navigation.navigate('Help')
+                }}>
+                    <Feather name="help-circle" size={24} color="#FFF" />
+                </TouchableOpacity>
+            ),
+        });
+    }, [props.navigation]);
+
     async function ShowAdMobInterstitial() {
         await AdMobInterstitial.requestAdAsync({ servePersonalizedAds: true })
         await AdMobInterstitial.showAdAsync();
     }
 
-    async function checkShowAdMob(){
+    async function checkShowAdMob() {
         countPlays.current++;
-        if (countPlays.current == 4 ) {
+        if (countPlays.current == 4) {
             await ShowAdMobInterstitial();
             countPlays.current = 0;
         }
     }
-    
+
     async function toPlayer() {
         await checkShowAdMob()
         props.navigation.navigate('Player')
@@ -108,7 +121,7 @@ const styles = StyleSheet.create({
         width: "90%",
         backgroundColor: "red",
         borderColor: "#ccc",
-        borderRadius: 30,        
+        borderRadius: 30,
         alignItems: "center",
         justifyContent: "center",
         marginTop: 30
