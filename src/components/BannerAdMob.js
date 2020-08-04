@@ -5,11 +5,11 @@ import { AdMobBanner } from 'expo-ads-admob';
 const BannerAdMobBanner = props => {
     return (
         <View>
-            <AdMobBanner
+            {/* <AdMobBanner
                 bannerSize="fullBanner"
                 adUnitID="ca-app-pub-3966719253606702/6829743132"
                 servePersonalizedAds
-                onDidFailToReceiveAdWithError={erro => console.log(erro)} />
+                onDidFailToReceiveAdWithError={erro => console.log(erro)} /> */}
         </View>
     )
 }

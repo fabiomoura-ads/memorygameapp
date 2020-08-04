@@ -21,17 +21,11 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true,
-      "config": {
-        "googleMobileAdsAppId": "ca-app-pub-3966719253606702~8061620671"
-      }
+      "supportsTablet": true
     },
     "android": {
       "package": "com.fmourabrasil.memorygameapp",
-      "versionCode": 8,
-      "config": {
-        "googleMobileAdsAppId": "ca-app-pub-3966719253606702~8061620671"
-      }
+      "versionCode": 9
     }
   }
 }

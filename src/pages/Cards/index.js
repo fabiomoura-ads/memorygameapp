@@ -18,12 +18,13 @@ export default props => {
 
     const countPlays = useRef(0);
 
-    useEffect(() => {
-        async function load() {
-            await AdMobInterstitial.setAdUnitID('ca-app-pub-3966719253606702/1496212326')
-        }
-        load();
-    })
+    //--retirado anúncio
+    // useEffect(() => {
+    //     async function load() {
+    //         await AdMobInterstitial.setAdUnitID('ca-app-pub-3966719253606702/1496212326')
+    //     }
+    //     load();
+    // })
 
     function selectOptionCard(opt) {
         setOptionCard(opt)
@@ -32,15 +33,15 @@ export default props => {
         setOptionPreview(opt)
     }
 
-    async function ShowAdMobInterstitial() {
-        await AdMobInterstitial.requestAdAsync({ servePersonalizedAds: true })
-        await AdMobInterstitial.showAdAsync();
-    }
+    // async function ShowAdMobInterstitial() {
+    //     await AdMobInterstitial.requestAdAsync({ servePersonalizedAds: true })
+    //     await AdMobInterstitial.showAdAsync();
+    // }
 
     async function toGame() {
         countPlays.current++;
         if (countPlays.current == 5 ) {
-            await ShowAdMobInterstitial();
+            //await ShowAdMobInterstitial();
             countPlays.current = 0;
         }
         props.navigation.navigate('Game', { optionLevel, optionCard, optionPreview, players, modeCompete: true})

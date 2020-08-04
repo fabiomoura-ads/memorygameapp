@@ -47,17 +47,17 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10
     },
     title: {
-        fontSize: 16,
+        fontSize: 18,
         fontWeight: "bold",
         color: "#000",
     },
     subtitle: {
-        fontSize: 12,
+        fontSize: 16,
         fontWeight: "bold",
         textAlign: "justify",
     },
     desc: {
-        fontSize: 12,
+        fontSize: 14,
         textAlign: "justify",
         fontWeight: "normal",
     },

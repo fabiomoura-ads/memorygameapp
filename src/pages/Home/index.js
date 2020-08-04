@@ -8,14 +8,14 @@ export default props => {
 
     const countPlays = useRef(3);
 
-    useEffect(() => {
-        async function load() {
-            try{
-                await AdMobInterstitial.setAdUnitID('ca-app-pub-3966719253606702/1496212326')
-            }catch(e){console.log('Error load ' + e)}            
-        }
-        load();
-    })
+    // useEffect(() => {
+    //     async function load() {
+    //         try{
+    //             await AdMobInterstitial.setAdUnitID('ca-app-pub-3966719253606702/1496212326')
+    //         }catch(e){console.log('Error load ' + e)}            
+    //     }
+    //     load();
+    // })
 
     useLayoutEffect(() => {
         props.navigation.setOptions({
@@ -29,29 +29,30 @@ export default props => {
         });
     }, [props.navigation]);
 
-    async function ShowAdMobInterstitial() {
-        try{
-            await AdMobInterstitial.requestAdAsync({ servePersonalizedAds: true })
-            await AdMobInterstitial.showAdAsync();
-        }catch(e){console.log('Error ShowAdMobInterstitial ' + e)}
+    //-- retirado anúncio
+    // async function ShowAdMobInterstitial() {
+    //     try{
+    //         await AdMobInterstitial.requestAdAsync({ servePersonalizedAds: true })
+    //         await AdMobInterstitial.showAdAsync();
+    //     }catch(e){console.log('Error ShowAdMobInterstitial ' + e)}
 
-    }
+    // }
 
     async function checkShowAdMob() {
         countPlays.current++;
         if (countPlays.current == 4) {
-            await ShowAdMobInterstitial();
+            //await ShowAdMobInterstitial();
             countPlays.current = 0;
         }
     }
 
     async function toPlayer() {
-        await checkShowAdMob()
+        //await checkShowAdMob()
         props.navigation.navigate('Player')
     }
 
     async function toGame() {
-        await checkShowAdMob()
+        //await checkShowAdMob()
         props.navigation.navigate('PlayerNormal')
     }
 
