@@ -25,7 +25,7 @@
     },
     "android": {
       "package": "com.fmourabrasil.memorygameapp",
-      "versionCode": 11
+      "versionCode": 12
     }
   }
 }
