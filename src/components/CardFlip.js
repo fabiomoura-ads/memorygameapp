@@ -36,7 +36,8 @@ export default props => {
 
         Animated.spring(animated, {
             toValue: 180,
-            speed: 15
+            speed: 15,
+            useNativeDriver: true
         }).start(({ finished }) => {
             props.onOpen(props.row, props.column)
         })
@@ -46,7 +47,8 @@ export default props => {
     function fechaCard() {
         Animated.spring(animated, {
             toValue: 0,
-            speed: 15
+            speed: 15,
+            useNativeDriver: true
         }).start()
     }
 
@@ -55,7 +57,8 @@ export default props => {
     } else {
         Animated.spring(animated, {
             toValue: 180,
-            speed: 12            
+            speed: 12,
+            useNativeDriver: true            
         }).start()
     }
 
