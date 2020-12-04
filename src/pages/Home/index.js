@@ -1,21 +1,10 @@
 import React, { useState, useEffect, useRef, useLayoutEffect } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
-import { BannerAdMobBanner } from '../../components/BannerAdMob'
-import { AdMobInterstitial } from 'expo-ads-admob'
 import { Feather } from '@expo/vector-icons';
 
 export default props => {
 
     const countPlays = useRef(3);
-
-    // useEffect(() => {
-    //     async function load() {
-    //         try{
-    //             await AdMobInterstitial.setAdUnitID('ca-app-pub-3966719253606702/1496212326')
-    //         }catch(e){console.log('Error load ' + e)}            
-    //     }
-    //     load();
-    // })
 
     useLayoutEffect(() => {
         props.navigation.setOptions({
@@ -29,30 +18,18 @@ export default props => {
         });
     }, [props.navigation]);
 
-    //-- retirado anúncio
-    // async function ShowAdMobInterstitial() {
-    //     try{
-    //         await AdMobInterstitial.requestAdAsync({ servePersonalizedAds: true })
-    //         await AdMobInterstitial.showAdAsync();
-    //     }catch(e){console.log('Error ShowAdMobInterstitial ' + e)}
-
-    // }
-
     async function checkShowAdMob() {
         countPlays.current++;
         if (countPlays.current == 4) {
-            //await ShowAdMobInterstitial();
             countPlays.current = 0;
         }
     }
 
     async function toPlayer() {
-        //await checkShowAdMob()
         props.navigation.navigate('Player')
     }
 
     async function toGame() {
-        //await checkShowAdMob()
         props.navigation.navigate('PlayerNormal')
     }
 
@@ -81,8 +58,6 @@ export default props => {
                     </TouchableOpacity>
                 </View>
             </View>
-
-            <BannerAdMobBanner />
 
         </View>
 

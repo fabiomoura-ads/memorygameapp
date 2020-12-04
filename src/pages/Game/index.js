@@ -3,50 +3,13 @@ import { StyleSheet, View, Text, Alert, TouchableOpacity, AsyncStorage } from 'r
 import { StackActions } from '@react-navigation/native';
 import { createCardBoard, wonGame, closeBoard } from './../../functions'
 import Board from '../../components/Board'
-import { BannerAdMobBanner } from '../../components/BannerAdMob'
 import params from '../../params';
 
 const Relogio = props => {
 
-    //const [time, setTime] = useState(props.time)
-    //const idIntervalRef = useRef(0);
-
-    /*function retornaDataFormatada() {
-        let data = new Date(time);
-        return data.getHours().toString().padStart(2, '0') + ":" + data.getMinutes().toString().padStart(2, '0') + ":" + data.getSeconds().toString().padStart(2, '0')
-    }
-
-    useEffect(() => {
-        schedullerTimer()
-
-        return function () {
-            setTime(time.setHours(0, 0, 0, 0))
-            clearInterval(idIntervalRef.current)
-        }
-
-    }, [])
-
-    function schedullerTimer() {
-        const idInterval = setInterval(() => {
-            setTime(time.setSeconds(time.getSeconds() + 1))
-        }, 1000)
-
-        idIntervalRef.current = idInterval;
-    }
-
-    useEffect(() => {
-        if (props.finishGame) {
-            clearInterval(idIntervalRef.current)
-            idIntervalRef.current = null;
-        } else if (!idIntervalRef.current) {
-            schedullerTimer()
-        }
-    }, [time])*/
-
     return (
         <View style={styles.headerTime}>
             <Text style={styles.textHeaderTime}>Pontos: {props.pointsGame} </Text>
-            { /*<Text style={styles.textHeaderTime}>Tempo: {retornaDataFormatada()}</Text> */}
         </View>
     )
 }
@@ -182,14 +145,6 @@ export default props => {
 
         return winners
 
-        /*
-        let winPlayer = { ...clonePlayers[0], victories: 0 }
-        for (var i = 0; i < clonePlayers.length; i++) {
-            if (clonePlayers[i].points > winPlayer.points) {
-                winPlayer = clonePlayers[i]
-            }
-        }
-        return winPlayer */
     }
 
     async function saveRanking(winners) {
@@ -219,10 +174,6 @@ export default props => {
 
             })
 
-            /*if (level.players.filter(player => player.id == winPlayer.id).length === 0) {
-                level.players.push(winPlayer)
-            }*/
-
             let newPlayers = level.players.map(player => {
 
                 //--se o jogador já existir nos players incrementa vitórias, senão só copia o jogador
@@ -232,12 +183,6 @@ export default props => {
                     return { ...player }
                 }
 
-                /*
-                if (player.id == winPlayer.id) {
-                    return { ...player, victories: player.victories + 1 }
-                } else {
-                    return { ...player }
-                }*/
             })
 
             return { ...level, players: newPlayers }
@@ -323,7 +268,6 @@ export default props => {
                     <Board board={board} onOpenSelect={onOpenSelect} />
                 </View>
             </View>
-            <BannerAdMobBanner />
         </>
     );
 }

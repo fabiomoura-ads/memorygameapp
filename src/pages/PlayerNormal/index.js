@@ -1,7 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
-import { BannerAdMobBanner } from '../../components/BannerAdMob'
-import { AdMobInterstitial } from 'expo-ads-admob'
 import Option from '../../components/Option'
 import OptAnimals from '../../images/opt_animals.jpg'
 import OptCars from '../../images/opt_cars.jpg'
@@ -16,18 +14,6 @@ export default props => {
 
     const countPlays = useRef(0);
 
-    // useEffect(() => {
-    //     async function load() {
-    //         await AdMobInterstitial.setAdUnitID('ca-app-pub-3966719253606702/1496212326')
-    //     }
-    //     load();
-    // })
-
-    // async function ShowAdMobInterstitial() {
-    //     await AdMobInterstitial.requestAdAsync({ servePersonalizedAds: true })
-    //     await AdMobInterstitial.showAdAsync();
-    // }
-
     function selectOptionLevel(opt) {
         setOptionLevel(opt)
     }
@@ -41,7 +27,6 @@ export default props => {
     async function toGame() {
         countPlays.current++;
         if (countPlays.current == 4 ) {
-            //await ShowAdMobInterstitial();
             countPlays.current = 0;
         }        
         props.navigation.navigate('Game', { optionLevel, optionCard, optionPreview })
@@ -90,8 +75,6 @@ export default props => {
                     <Text style={styles.buttonStart}> Iniciar jogo </Text>
                 </TouchableOpacity>
             </View>
-
-            <BannerAdMobBanner />
 
         </View>
 

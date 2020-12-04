@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { View, Text, StyleSheet, TouchableOpacity, AsyncStorage, KeyboardAvoidingView, Platform, FlatList, TextInput, Keyboard, Alert, ImageBackground } from 'react-native'
-import { BannerAdMobBanner } from '../../components/BannerAdMob'
+import { View, Text, StyleSheet, TouchableOpacity, AsyncStorage, KeyboardAvoidingView, Platform, FlatList, TextInput, Keyboard, Alert, ImageBackground } from 'react-native';
 import { Ionicons, MaterialIcons, AntDesign } from '@expo/vector-icons';
 import Option from '../../components/Option'
 import Trofeu from '../../images/trofeu.png';
@@ -229,7 +228,6 @@ export default props => {
                         </TouchableOpacity>
                     </View>
 
-                    <BannerAdMobBanner />
                 </View>
             </KeyboardAvoidingView>
         </>
