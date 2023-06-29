@@ -1,3 +1,4 @@
 # memorygameapp
 
-Aplicativo mobile de jogo da memória desenvolvido com Expo.
+Aplicativo Memorizze Game desenvolvido com Expo.
+App de jogo da memória com ranqueamento de vitórias no dispositivo.
